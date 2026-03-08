@@ -1,0 +1,10 @@
+# nixpacks.toml
+
+[phases.setup]
+nixPkgs = ["nodejs", "yarn"]
+
+[phases.build]
+cmds = ["yarn", "yarn build-only"]
+
+[start]
+cmd = "npx serve -l 3000 -s dist"

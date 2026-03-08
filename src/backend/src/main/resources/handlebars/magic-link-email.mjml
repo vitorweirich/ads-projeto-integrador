@@ -1,0 +1,30 @@
+<mjml>
+  <mj-head>
+    <mj-title>Login Mágico</mj-title>
+    <mj-preview>Seu link mágico de login</mj-preview>
+  </mj-head>
+  <mj-body background-color="#f5f5f5">
+    <mj-section>
+      <mj-column>
+        <mj-text font-size="20px" font-weight="bold" color="#333333">
+          Aqui está seu link mágico de login
+        </mj-text>
+        <mj-text font-size="16px" color="#555555"> Olá, {{userName}}! </mj-text>
+        <mj-text> Clique no botão abaixo para acessar sua conta: </mj-text>
+        <mj-button
+          href="{{magicLink}}"
+          background-color="#007bff"
+          color="#ffffff"
+        >
+          Entrar com link mágico
+        </mj-button>
+        <mj-text font-size="12px" color="#999999">
+          Este link é válido por 10 minutos e só pode ser usado uma vez.
+        </mj-text>
+        <mj-text font-size="12px" color="#999999">
+          Se você não solicitou esse e-mail, pode ignorá-lo com segurança.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

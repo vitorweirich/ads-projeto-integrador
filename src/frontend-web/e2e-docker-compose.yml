@@ -1,0 +1,148 @@
+version: '3.8'
+
+services:
+  mailpit:
+    # https://mailpit.axllent.org/docs/install/docker/
+    image: axllent/mailpit
+    container_name: mailpit
+    restart: unless-stopped
+    volumes:
+      - ./emaildata:/data
+    ports:
+      - 8025:8025
+      - 1025:1025
+    environment:
+      MP_MAX_MESSAGES: 5000
+      MP_DATABASE: /data/mailpit.db
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - ./postgresql.conf:/etc/postgresql/postgresql.conf:ro
+    ports:
+      # Não é necessário expor a porta do Postgres para rodar os testes,
+      # continua sendo útila para analisar os dados no banco
+      - 5432:5432
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  init_postgres:
+    image: postgres:latest
+    depends_on:
+      postgres:
+        condition: service_healthy
+    entrypoint: >
+      bash -c "
+        echo 'Aguardando Postgres...';
+        until pg_isready -h postgres -U postgres; do sleep 1; done;
+        echo 'Resetando banco de dados...';
+        PGPASSWORD=postgres psql -h postgres -U postgres -d postgres -c 'DROP SCHEMA public CASCADE; CREATE SCHEMA public;';
+      "
+
+  minio:
+    image: minio/minio:latest
+    command: server --console-address ":9001" /data
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+      MINIO_SERVER_URL: http://localhost:9000
+    ports:
+      - 9000:9000
+      - 9001:9001
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio_init:
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+        mc alias set local http://minio:9000 minioadmin minioadmin &&
+        mc mb --ignore-existing local/videos &&
+        mc policy set readonly local/videos
+      "
+
+  fileshare-api:
+    image: registry.vitorweirich.com/file-share-backend
+    ports:
+      - 8080:8080
+    environment:
+      # Variáveis para Spring Mail configuradas para MailPit
+      EMAIL_HOST: mailpit
+      EMAIL_PORT: 1025
+      # O MailPit não requer autenticação, mas é necessário setar o username
+      # pois é usado na aplicação para identificar o remetente
+      EMAIL_USERNAME: 'mail@mail.com'
+      EMAIL_PASSWORD: ''
+      EMAIL_SMTP_AUTH: 'false'
+      EMAIL_SMTP_STARTTLS_ENABLE: 'false'
+      EMAIL_SMTP_STARTTLS_REQUIRED: 'false'
+
+      # Variáveis banco de dados
+      DATABASE_URL: jdbc:postgresql://postgres:5432/postgres
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+
+      # Variáveis MinIO (exemplo)
+      AWS_ACCESS_KEY_ID_ENV: minioadmin
+      AWS_SECRET_ACCESS_KEY_ENV: minioadmin
+      CLOUDFLARE_R2_ENDPOINT_ENV: http://host.docker.internal:9000
+
+      ADMIN_EMAILS: 'weirichvitor@gmail.com,user_teste1@teste.com,user_teste2@teste.com'
+
+      # Outras variáveis que você usa (ajuste conforme necessidade)
+      JWT_SECRET: chave-super-secreta-de-64-bytes-exatamente-para-HS512!!!1234567890
+      JWT_ACCESS_TOKEN_EXPIRATION: 900
+      JWT_REFRESH_TOKEN_EXPIRATION: 1296000
+      SHORT_URL_BASE_URL: http://localhost:8080/v1/share-url
+      CONFIRMATION_BASE_URL: http://localhost:5173/confirm-email
+      CONFIRMATION_EXPIRATION_MINUTES: 1440
+      MAGIC_LINK_BASE_URL: http://localhost:8080
+      RESET_PASSWORD_BASE_URL: http://localhost:5173/reset-password
+      COOKIE_SECURE: 'false'
+      COOKIE_SAMESITE: Lax
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    depends_on:
+      init_postgres:
+        condition: service_completed_successfully
+      minio_init:
+        condition: service_completed_successfully
+      mailpit:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+
+  # Não é necessário o serviço de frontend aqui, pode ser executado separadamente com `yarn dev`
+  # Adicionado aqui para ter o setup completo
+  fileshare-ui:
+    # Image id gerada localmente, ajuste conforme necessário
+    image: 63cb0e5e6ff0
+    ports:
+      - 5173:3000
+    depends_on:
+      fileshare-api:
+        condition: service_healthy
+
+volumes:
+  minio-data:
+  emaildata:

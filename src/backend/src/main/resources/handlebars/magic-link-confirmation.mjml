@@ -1,0 +1,25 @@
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-text font-size="20px" color="#333333" font-family="Helvetica Neue"
+          >Confirme seu cadastro</mj-text
+        >
+        <mj-text font-size="16px" color="#555555">Olá, {{name}}!</mj-text>
+        <mj-text font-size="16px" color="#555555"
+          >Clique no botão abaixo para confirmar seu e-mail e finalizar seu
+          cadastro:</mj-text
+        >
+        <mj-button
+          background-color="#346DB7"
+          color="white"
+          href="{{confirmationUrl}}"
+          >Confirmar e-mail</mj-button
+        >
+        <mj-text font-size="12px" color="#999999"
+          >Se você não solicitou este cadastro, ignore este e-mail.</mj-text
+        >
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

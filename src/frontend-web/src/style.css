@@ -1,0 +1,150 @@
+@layer theme, custom-base, custom-components, custom-utilities;
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/preflight.css' layer(custom-base);
+@import 'tailwindcss/utilities.css' layer(custom-utilities);
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --color-bg: #ffffff;
+    --color-text: #1f2937; /* gray-800 */
+    --color-muted: #6b7280; /* gray-500 */
+    --color-border: #e5e7eb; /* gray-200 */
+    --color-primary: #10b981; /* emerald-500 */
+    --color-primary-hover: #0d9488; /* emerald-600 */
+    --color-primary-focus: #059669; /* emerald-500 */
+    --color-primary-active: #047857; /* emerald-700 */
+    --color-disabled: #9ca3af; /* gray-400 */
+    --color-secondary: oklch(39.1% 0.09 240.876); /* sky-900 */
+    --color-secondary-hover: oklch(29.475% 0.06436 239.648);
+    --color-danger: oklch(44.4% 0.177 26.899);
+    --color-danger-hover: oklch(27.585% 0.10923 25.509);
+  }
+
+  .dark {
+    --color-bg: #1f2021;
+    --color-text: #f3f4f6; /* gray-100 */
+    --color-muted: #9ca3af; /* gray-400 */
+    --color-border: #374151; /* gray-700 */
+    --color-primary: #1d7856; /* emerald-400 */
+    --color-primary-hover: #15803d; /* emerald-600 */
+    --color-primary-focus: #16a34a; /* emerald-500 */
+    --color-primary-active: #166534; /* emerald-700 */
+    --color-disabled: #4b5563; /* gray-600 */
+    --color-secondary: oklch(39.1% 0.09 240.876); /* sky-900 */
+    --color-secondary-hover: oklch(29.475% 0.06436 239.648);
+    --color-danger: oklch(44.4% 0.177 26.899);
+    --color-danger-hover: oklch(27.585% 0.10923 25.509);
+  }
+
+  html,
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    @apply antialiased;
+  }
+
+  a,
+  button {
+    transition:
+      color 0.2s,
+      background-color 0.2s,
+      border-color 0.2s;
+    outline: none;
+  }
+
+  a {
+    color: var(--color-primary);
+  }
+
+  a:hover {
+    color: var(--color-primary-hover);
+  }
+
+  a:focus {
+    color: var(--color-primary-focus);
+  }
+
+  button {
+    background-color: var(--color-primary);
+    color: white;
+  }
+
+  button:hover {
+    background-color: var(--color-primary-hover);
+  }
+
+  button:focus {
+    background-color: var(--color-primary-focus);
+  }
+
+  button:active {
+    background-color: var(--color-primary-active);
+  }
+
+  button:disabled {
+    background-color: var(--color-disabled);
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  input,
+  textarea,
+  select {
+    @apply rounded border border-[var(--color-border)] bg-[var(--color-bg)] px-3 py-2 text-[var(--color-text)];
+    transition:
+      border-color 0.2s,
+      box-shadow 0.2s;
+  }
+
+  input:focus,
+  textarea:focus,
+  select:focus {
+    outline: none;
+    border-color: var(--color-primary-focus);
+    box-shadow: 0 0 0 2px var(--color-primary-focus);
+  }
+
+  ::selection {
+    background-color: var(--color-primary);
+    color: white;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply rounded bg-[var(--color-primary)] px-4 py-2 text-[var(--color-text)] transition;
+
+    @apply hover:opacity-90 enabled:hover:opacity-90;
+    @apply disabled:cursor-not-allowed disabled:bg-[var(--color-disabled)] disabled:opacity-60;
+  }
+
+  .btn-secondary {
+    @apply rounded bg-[var(--color-secondary)] px-4 py-2 text-[var(--color-text)] transition;
+
+    @apply hover:opacity-90 enabled:hover:opacity-90;
+    @apply disabled:cursor-not-allowed disabled:bg-[var(--color-disabled)] disabled:opacity-60;
+  }
+
+  /* Text colors */
+  .text-error {
+    color: var(--color-danger);
+  }
+
+  /* Backgroun colors */
+  .bg-secondary {
+    background-color: var(--color-secondary);
+  }
+  .bg-secondary:hover {
+    background-color: var(--color-secondary-hover);
+  }
+
+  .bg-danger {
+    background-color: var(--color-danger);
+  }
+
+  .bg-danger:hover {
+    background-color: var(--color-danger-hover);
+  }
+}

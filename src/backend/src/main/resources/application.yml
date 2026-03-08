@@ -1,0 +1,72 @@
+spring:
+  aot:
+    enabled: true
+    remove-unused-autoconfig: true
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: false
+  main:
+    allow-bean-definition-overriding: true
+  mail:
+    host: ${EMAIL_HOST:localhost}
+    port: ${EMAIL_PORT:1025}
+    username: ${EMAIL_USERNAME:teste@gmail.com}
+    password: ${EMAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: ${EMAIL_SMTP_AUTH:true}
+          starttls:
+            enable: ${EMAIL_SMTP_STARTTLS_ENABLE:true}
+            required: ${EMAIL_SMTP_STARTTLS_REQUIRED:true}
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/postgres}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+  jpa:
+    show-sql: ${JPA_SHOW_SQL:false}
+    open-in-view: false
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        format_sql: false
+    hibernate:
+      ddl-auto: none
+      order_by:
+        default_null_ordering: last
+  flyway:
+    enabled: true
+    flywaybaseline-on-migrate: true
+
+AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID_ENV:minioadmin}
+AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY_ENV:minioadmin}
+CLOUDFLARE_R2_ENDPOINT: ${CLOUDFLARE_R2_ENDPOINT_ENV:http://localhost:9000}
+
+storage:
+  default-max-per-user: ${STORAGE_MAX_PER_USER:2147483648} # 2 GB
+  default-max-video-retention-days: ${STORAGE_MAX_RETENTION_DAYS:30}
+  # TODO: Colocar limite mais baixa, bater com o limite do bucket
+  max-total: ${STORAGE_MAX_TOTAL:107374182400} # 100 GB
+
+admin:
+  admin-emails: ${ADMIN_EMAILS:weirichvitor@gmail.com}
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:chave-super-secreta-de-64-bytes-exatamente-para-HS512!!!1234567890}
+    access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:900}
+    refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:1296000}
+  share:
+    base-url: ${SHORT_URL_BASE_URL:http://localhost:8080/v1/share-url}
+  confirmation:
+    base-url: ${CONFIRMATION_BASE_URL:http://localhost:5173/confirm-email}
+    expiration-minutes: ${CONFIRMATION_EXPIRATION_MINUTES:1440}
+  magic-link:
+    base-url: ${MAGIC_LINK_BASE_URL:http://localhost:8080}
+  reset-password:
+    base-url: ${RESET_PASSWORD_BASE_URL:http://localhost:5173/reset-password}
+  cookie:
+    secure: ${COOKIE_SECURE:false} # PRD deve ser: "true"
+    domain: ${COOKIE_DOMAIN:}
+    sameSite: ${COOKIE_SAMESITE:Lax} # PRD deve ser: "None"

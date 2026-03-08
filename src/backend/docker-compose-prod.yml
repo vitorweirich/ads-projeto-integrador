@@ -1,0 +1,45 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+    expose:
+      - "8080"
+    networks:
+      - coolify
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-:jdbc:postgresql://localhost:5432/postgres}
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-12345678}
+      JWT_SECRET: ${JWT_SECRET:-doacoesSecretKey2025SystemSecurityTokenJWT}
+      JWT_ACCESS_TOKEN_EXPIRATION: ${JWT_ACCESS_TOKEN_EXPIRATION:-900}
+      JWT_REFRESH_TOKEN_EXPIRATION: ${JWT_REFRESH_TOKEN_EXPIRATION:-1296000}
+      SERVER_PORT: ${SERVER_PORT:-8080}
+      COOKIE_SECURE: ${COOKIE_SECURE:-true}
+      COOKIE_DOMAIN: ${COOKIE_DOMAIN:-.vitorweirich.com}
+      COOKIE_SAMESITE: ${COOKIE_SAMESITE:-None}
+      EMAIL_HOST: ${EMAIL_HOST}
+      EMAIL_PORT: ${EMAIL_PORT}
+      EMAIL_USERNAME: ${EMAIL_USERNAME}
+      EMAIL_PASSWORD: ${EMAIL_PASSWORD}
+      AWS_ACCESS_KEY_ID_ENV: ${AWS_ACCESS_KEY_ID_ENV}
+      AWS_SECRET_ACCESS_KEY_ENV: ${AWS_SECRET_ACCESS_KEY_ENV}
+      CLOUDFLARE_R2_ENDPOINT_ENV: ${CLOUDFLARE_R2_ENDPOINT_ENV}
+      MAGIC_LINK_BASE_URL: ${MAGIC_LINK_BASE_URL:-https://videos.vitorweirich.com}
+      CONFIRMATION_BASE_URL: ${CONFIRMATION_BASE_URL:-https://videos.vitorweirich.com/v1/api/auth/confirm}
+      CONFIRMATION_EXPIRATION_MINUTES: ${CONFIRMATION_EXPIRATION_MINUTES:-1440}
+      SHORT_URL_BASE_URL: ${SHORT_URL_BASE_URL:-https://videos.vitorweirich.com/v1/share-url}
+      RESET_PASSWORD_BASE_URL: ${RESET_PASSWORD_BASE_URL:-https://videos-ui.vitorweirich.com/reset-password}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    mem_limit: 750m
+    cpus: 0.2
+
+networks:
+  coolify:
+    external: true

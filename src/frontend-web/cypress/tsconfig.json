@@ -1,0 +1,18 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "types": ["cypress", "node"],
+    "module": "ESNext",
+    "lib": ["es2015"],
+    "allowJs": true,
+    "isolatedModules": false,
+    "noEmit": true,
+    "strict": true,
+    "baseUrl": "../",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.js", "**/*.cy.ts"],
+  "exclude": ["../node_modules", "../tests/unit", "../**/*.spec.ts"]
+}
