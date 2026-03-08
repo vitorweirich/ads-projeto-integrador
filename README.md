@@ -20,9 +20,9 @@ Projeto academico para planejar e construir uma plataforma de upload, listagem e
 
 ## Documentacao Organizada
 
-### Requisitos
+### Requisitos e decisões de plataforma e tecnologias
 
-Descricao breve: documento com escopo funcional e nao funcional do sistema.
+Descricao breve: documento com escopo funcional e nao funcional do sistema, juntamente das plataformas e tecnologias escolhidas.
 
 - [Requisitos do sistema](./requisitos/requisitos.md)
 
@@ -31,3 +31,11 @@ Descricao breve: documento com escopo funcional e nao funcional do sistema.
 Descricao breve: wireframes e fluxo visual simplificado das telas principais do aplicativo.
 
 - [Prototipo de layout mobile](./prototipo-layout-mobile-simplificado/prototipo-layout-mobile.md)
+
+### Canvas do modelo de negócio
+
+![Canvas do modelo de negócio](./canvas-do-modelo-de-negocio.pdf)
+
+### Diagramas
+
+// TODO

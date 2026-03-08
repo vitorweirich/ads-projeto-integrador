@@ -1,9 +1,5 @@
 ﻿# Projeto Aplicativo Mobile: FileShare
 
-**Disclaimer**:
-
-> **Os requisitos estão simplificados, servindo apenas para ter uma ideia da concepção do sistema, mas não englobam todas as fucionalidades (a título de exemplos, só existem telas para quando o compartilhamento for um vídeo).**
-
 ## 1. Requisitos do Aplicativo
 
 ### 1.1. Requisitos Funcionais
