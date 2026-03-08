@@ -24,17 +24,17 @@ Projeto academico para planejar e construir uma plataforma de upload, listagem e
 
 Descricao breve: documento com escopo funcional e nao funcional do sistema, juntamente das plataformas e tecnologias escolhidas.
 
-- [Requisitos do sistema](./requisitos/requisitos.md)
+- [Requisitos do sistema](./docs/requisitos/requisitos.md)
 
 ### Prototipo (APP Mobile)
 
 Descricao breve: wireframes e fluxo visual simplificado das telas principais do aplicativo.
 
-- [Prototipo de layout mobile](./prototipo-layout-mobile-simplificado/prototipo-layout-mobile.md)
+- [Prototipo de layout mobile](./docs/prototipo-layout-mobile-simplificado/prototipo-layout-mobile.md)
 
 ### Canvas do modelo de negócio
 
-![Canvas do modelo de negócio](./canvas-do-modelo-de-negocio.pdf)
+![Canvas do modelo de negócio](./docs/canvas-do-modelo-de-negocio.png)
 
 ### Diagramas
 
