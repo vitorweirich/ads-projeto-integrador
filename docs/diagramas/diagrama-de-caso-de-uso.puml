@@ -1,0 +1,92 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Visitante" as Guest
+actor "Usuário Autenticado" as User
+actor "Administrador" as Admin
+actor "Espectador com Link" as Viewer
+
+Admin --|> User
+
+rectangle "File Share" {
+
+  usecase "Cadastrar conta" as UC_Register
+  usecase "Confirmar e-mail" as UC_ConfirmEmail
+  usecase "Fazer login" as UC_Login
+  usecase "Verificar MFA no login" as UC_VerifyMfaLogin
+  usecase "Solicitar recuperação de senha" as UC_ForgotPassword
+  usecase "Redefinir senha" as UC_ResetPassword
+  usecase "Autenticar por magic link" as UC_MagicLink
+
+  usecase "Ver perfil" as UC_Profile
+  usecase "Fazer logout" as UC_Logout
+  usecase "Excluir conta" as UC_DeleteAccount
+
+  usecase "Habilitar MFA" as UC_EnableMfa
+  usecase "Iniciar setup MFA" as UC_MfaInit
+  usecase "Gerar QR Code MFA" as UC_MfaQr
+  usecase "Confirmar setup MFA" as UC_MfaConfirm
+
+  usecase "Listar meus vídeos" as UC_ListMyVideos
+  usecase "Upload de vídeo (simples)" as UC_UploadSingle
+  usecase "Upload de vídeos (múltiplo)" as UC_UploadMultiple
+  usecase "Solicitar URL assinada para upload" as UC_RequestUploadUrl
+  usecase "Registrar upload concluído" as UC_RegisterUploaded
+
+  usecase "Visualizar detalhes do vídeo" as UC_ViewVideo
+  usecase "Gerar link de compartilhamento" as UC_GenerateShareLink
+  usecase "Excluir vídeo próprio" as UC_DeleteOwnVideo
+
+  usecase "Assistir vídeo por link compartilhado" as UC_WatchShared
+  usecase "Resolver short link / redirecionar" as UC_ResolveShortLink
+
+  usecase "Listar usuários (admin)" as UC_AdminListUsers
+  usecase "Resetar MFA de usuário (admin)" as UC_AdminResetMfa
+  usecase "Listar vídeos da plataforma (admin)" as UC_AdminListVideos
+  usecase "Visualizar vídeo (admin)" as UC_AdminViewVideo
+  usecase "Excluir vídeo (admin)" as UC_AdminDeleteVideo
+}
+
+Guest --> UC_Register
+Guest --> UC_ConfirmEmail
+Guest --> UC_Login
+Guest --> UC_ForgotPassword
+Guest --> UC_ResetPassword
+Guest --> UC_MagicLink
+
+User --> UC_Profile
+User --> UC_Logout
+User --> UC_DeleteAccount
+User --> UC_EnableMfa
+User --> UC_ListMyVideos
+User --> UC_UploadSingle
+User --> UC_UploadMultiple
+User --> UC_ViewVideo
+User --> UC_GenerateShareLink
+User --> UC_DeleteOwnVideo
+
+Viewer --> UC_WatchShared
+
+Admin --> UC_AdminListUsers
+Admin --> UC_AdminResetMfa
+Admin --> UC_AdminListVideos
+Admin --> UC_AdminViewVideo
+Admin --> UC_AdminDeleteVideo
+
+UC_Login .> UC_VerifyMfaLogin : <<extend>>
+UC_Register .> UC_ConfirmEmail : <<include>>
+
+UC_EnableMfa .> UC_MfaInit : <<include>>
+UC_EnableMfa .> UC_MfaQr : <<include>>
+UC_EnableMfa .> UC_MfaConfirm : <<include>>
+
+UC_UploadSingle .> UC_RequestUploadUrl : <<include>>
+UC_UploadSingle .> UC_RegisterUploaded : <<include>>
+UC_UploadMultiple .> UC_RequestUploadUrl : <<include>>
+UC_UploadMultiple .> UC_RegisterUploaded : <<include>>
+
+UC_GenerateShareLink .> UC_ResolveShortLink : <<include>>
+UC_WatchShared .> UC_ResolveShortLink : <<include>>
+
+@enduml

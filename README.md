@@ -38,4 +38,6 @@ Descricao breve: wireframes e fluxo visual simplificado das telas principais do 
 
 ### Diagramas
 
-// TODO
+Descricao breve: Centralizacao dos diagramas projeto.
+
+- [Ver README de diagramas](./docs/diagramas/README.md)

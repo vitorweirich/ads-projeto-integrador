@@ -1,0 +1,24 @@
+@startuml
+title Sequência - Visualização de Vídeo Compartilhado
+
+actor "Espectador" as V
+participant "Frontend" as FE
+participant "API" as API
+database "Banco de Dados" as DB
+collections "Storage (S3/R2)" as ST
+
+V -> FE: Abre /watch-v2/{shortId}
+FE -> API: GET /v1/share-url/{shortId}?jsonResponse=true
+API -> DB: Resolve shortId -> URL original
+DB --> API: URL assinada/original
+API --> FE: 200 { url }
+
+FE -> ST: GET vídeo (url resolvida)
+ST --> FE: Stream de vídeo (bytes)
+FE --> V: Reprodução no player
+
+alt Link inválido/expirado
+  API --> FE: erro (404/400)
+  FE --> V: "Esse vídeo não existe ou o link expirou"
+end
+@enduml

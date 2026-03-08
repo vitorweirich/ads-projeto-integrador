@@ -1,0 +1,88 @@
+@startuml
+title Diagrama de Banco de Dados
+
+hide circle
+skinparam linetype ortho
+
+entity "USERS" as users {
+  *id : BIGINT <<PK>>
+  --
+  name : VARCHAR(100)
+  email : VARCHAR(100) <<UQ>>
+  password : VARCHAR(120)
+  role : VARCHAR(255)
+  mfa_secret : VARCHAR(255)
+  mfa_verified : BOOLEAN
+  created_at : TIMESTAMP WITH TIME ZONE
+}
+
+entity "USER_SETTINGS" as user_settings {
+  *user_id : BIGINT <<PK, FK>>
+  --
+  storage_limit_bytes : BIGINT
+  max_video_retention_days : INT
+  modified_at : TIMESTAMP WITH TIME ZONE
+}
+
+entity "UPLOADED_VIDEOS" as uploaded_videos {
+  *id : BIGINT <<PK>>
+  --
+  creator_id : BIGINT <<FK>>
+  name : VARCHAR(100)
+  object_key : VARCHAR(136)
+  size_bytes : BIGINT
+  uploaded : BOOLEAN
+  created_at : TIMESTAMP WITH TIME ZONE
+  share_url : VARCHAR(100)
+  short_url_hash : VARCHAR(8) <<IDX>>
+  original_url : VARCHAR(600)
+  expires_in : TIMESTAMP WITH TIME ZONE
+}
+
+entity "PASSWORD_RESET_TOKENS" as password_reset_tokens {
+  *id : UUID <<PK>>
+  --
+  user_id : BIGINT <<FK>>
+  created_at : TIMESTAMP WITH TIME ZONE
+  expires_at : TIMESTAMP WITH TIME ZONE
+}
+
+entity "REFRESH_TOKENS" as refresh_tokens {
+  *id : UUID <<PK>>
+  --
+  user_id : BIGINT
+  family_id : TEXT
+  created_at : TIMESTAMP WITH TIME ZONE
+  expires_at : TIMESTAMP WITH TIME ZONE
+  revoked : BOOLEAN
+  replaced_by : TEXT
+  user_agent : TEXT
+  ip_address : TEXT
+}
+
+entity "TEMPORARY_USERS" as temporary_users {
+  *id : BIGINT <<PK>>
+  --
+  name : VARCHAR(255)
+  email : VARCHAR(255) <<UQ>>
+  password : VARCHAR(255)
+  confirmation_token : VARCHAR(255)
+  created_at : TIMESTAMP WITH TIME ZONE
+  expires_at : TIMESTAMP WITH TIME ZONE
+}
+
+entity "MAGIC_LINK_TOKENS" as magic_link_tokens {
+  *id : BIGINT <<PK>>
+  --
+  email : VARCHAR(255)
+  token : VARCHAR(255) <<UQ>>
+  created_at : TIMESTAMP WITH TIME ZONE
+  expires_at : TIMESTAMP WITH TIME ZONE
+}
+
+users ||--|| user_settings : "user_id"
+users ||--o{ uploaded_videos : "creator_id"
+users ||--o{ password_reset_tokens : "user_id"
+users ||--o{ refresh_tokens : "user_id"
+
+@enduml
