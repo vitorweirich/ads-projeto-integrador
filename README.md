@@ -1,4 +1,4 @@
-# Projeto Integrador
+﻿# Projeto Integrador
 
 - Aluno(a): Vitor Mateus Weirich (weirichvitor@gmail.com)
 - Código: 369881
@@ -16,4 +16,18 @@ Além do código-fonte, o repositório também inclui documentação do projeto 
 
 ## FileShare
 
-// TODO: Escrever uma breve descrição dos sistema (propósito, funcionalidade, etc).
+Projeto academico para planejar e construir uma plataforma de upload, listagem e compartilhamento de arquivos com acesso autenticado.
+
+## Documentacao Organizada
+
+### Requisitos
+
+Descricao breve: documento com escopo funcional e nao funcional do sistema.
+
+- [Requisitos do sistema](./requisitos/requisitos.md)
+
+### Prototipo (APP Mobile)
+
+Descricao breve: wireframes e fluxo visual simplificado das telas principais do aplicativo.
+
+- [Prototipo de layout mobile](./prototipo-layout-mobile-simplificado/prototipo-layout-mobile.md)
