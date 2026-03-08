@@ -2,11 +2,11 @@
 
 Este documento centraliza os diagramas em formato PNG.
 
-## Caso de Uso
-
-### Diagrama do Banco de Dados
+## Diagrama do Banco de Dados
 
 ![Diagrama do Banco de Dados](./diagrama-banco-de-dados.png)
+
+## Caso de Uso
 
 ### Diagrama de Caso de Uso
 
