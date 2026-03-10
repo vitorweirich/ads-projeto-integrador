@@ -4,7 +4,7 @@ import java.time.ZonedDateTime;
 
 import org.springframework.stereotype.Service;
 
-import com.github.fileshare.respositories.UploadedVideoRepository;
+import com.github.fileshare.respositories.UploadedFileRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,27 +14,27 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SchedulerServiceImpl implements SchedulerService {
 
-	private final UploadedVideoRepository uploadedVideoRepository;
+	private final UploadedFileRepository uploadedFileRepository;
 	
 	@Override
 	public void removeExpiredLinks() {
 		log.info("SchedulerServiceImpl.removeExpiredLinks - start");
 		long start = System.currentTimeMillis();
 		
-		int deleteByExpired = uploadedVideoRepository.updateExpiredLinks(ZonedDateTime.now());
+		int deleteByExpired = uploadedFileRepository.updateExpiredLinks(ZonedDateTime.now());
 
 		log.info("SchedulerServiceImpl.removeExpiredLinks - end - updateCount [{}] - took [{}]ms", deleteByExpired, System.currentTimeMillis() - start);
 	}
 	
 	@Override
-	public void removeNotUploadedVideos() {
-		log.info("SchedulerServiceImpl.removeNotUploadedVideos - start");
+	public void removeNotUploadedFiles() {
+		log.info("SchedulerServiceImpl.removeNotUploadedFiles - start");
 		long start = System.currentTimeMillis();
 		
-		int deleteByExpired = uploadedVideoRepository
-				.deleteByNotUploaded(ZonedDateTime.now().minusMinutes(VideoServiceImpl.PUT_VIDEO_URL_EXPIRATION_IN_MINUTES * 2));
+		int deleteByExpired = uploadedFileRepository
+				.deleteByNotUploaded(ZonedDateTime.now().minusMinutes(FileServiceImpl.PUT_FILE_URL_EXPIRATION_IN_MINUTES * 2));
 
-		log.info("SchedulerServiceImpl.removeNotUploadedVideos - end - deleteCount [{}] - took [{}]ms", deleteByExpired, System.currentTimeMillis() - start);
+		log.info("SchedulerServiceImpl.removeNotUploadedFiles - end - deleteCount [{}] - took [{}]ms", deleteByExpired, System.currentTimeMillis() - start);
 	}
 
 }

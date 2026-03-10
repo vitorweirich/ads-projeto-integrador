@@ -9,7 +9,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.github.fileshare.dto.response.AdminVideoSignedUrl;
+import com.github.fileshare.dto.response.AdminFileSignedUrl;
 import com.github.fileshare.exceptions.MessageFeedbackException;
 
 public class PreSignedUrlUtils {
@@ -29,11 +29,11 @@ public class PreSignedUrlUtils {
         }
     }
 	
-	public static AdminVideoSignedUrl extractTimestampsFromPreSignedUrl(AdminVideoSignedUrl video) {
-		UrlTimestamps extrectedTimestamps = extractTimestampsFromPreSignedUrl(video.getSignedUrl());
-		video.setTimestamps(extrectedTimestamps);
+	public static AdminFileSignedUrl extractTimestampsFromPreSignedUrl(AdminFileSignedUrl file) {
+		UrlTimestamps extrectedTimestamps = extractTimestampsFromPreSignedUrl(file.getSignedUrl());
+		file.setTimestamps(extrectedTimestamps);
 		
-		return video;
+		return file;
 	}
 
     public static UrlTimestamps extractTimestampsFromPreSignedUrl(String preSignedUrl) {

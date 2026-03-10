@@ -65,8 +65,8 @@ public class WebSecurityConfig {
             "http://localhost:3000",
             "http://localhost:5173",
             "https://tauri.localhost",
-            "https://videos-ui.vitorweirich.com",
-            "https://videos.vitorweirich.com",
+            "https://files-ui.vitorweirich.com",
+            "https://files.vitorweirich.com",
             "https://minio.vitorweirich.com"
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));

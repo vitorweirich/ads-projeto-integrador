@@ -4,9 +4,10 @@ import api from '@/services/api'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useToastStore } from '@/stores/toast'
+import { allowedMimeTypes } from '@/constants/fileTypes'
 
 const file = ref<File | null>(null)
-const videoPreview = ref<string | null>(null)
+const filePreview = ref<string | null>(null)
 const title = ref<string>('')
 const uploading = ref(false)
 const uploadingProgress = ref(0)
@@ -15,27 +16,21 @@ const router = useRouter()
 
 const authStore = useAuthStore()
 
-const allowedTypes = [
-  'video/mp4',
-  'video/x-msvideo',
-  'video/x-matroska',
-  'video/quicktime',
-  'video/x-ms-wmv',
-  'video/mp2t',
-]
+// Tipos de arquivos permitidos e preview definidos em src/constants/fileTypes.ts
 
 const processFile = async (selected: File) => {
-  if (!allowedTypes.includes(selected.type)) {
-    uploadError.value = 'Formato de vídeo não suportado. Use mp4, avi, mkv, mov, wmv ou ts.'
+  if (!allowedMimeTypes.includes(selected.type)) {
+    uploadError.value =
+      'Formato de arquivo não suportado. Use mp4, avi, mkv, mov, wmv, ts, jpg ou jpeg.'
     file.value = null
-    videoPreview.value = null
+    filePreview.value = null
     return
   }
 
   if (selected.size > 2000 * 1024 * 1024) {
-    uploadError.value = 'O vídeo não pode ser maior que 2 GB.'
+    uploadError.value = 'O arquivo não pode ser maior que 2 GB.'
     file.value = null
-    videoPreview.value = null
+    filePreview.value = null
     return
   }
 
@@ -44,24 +39,24 @@ const processFile = async (selected: File) => {
   const userStorage = loggedInUser.storage
 
   if (userStorage?.totalQuota - userStorage?.usedQuota < selected.size) {
-    const message = 'Cota de armazenamento insuficiente. Exclua alguns vídeos para liberar espaço'
+    const message = 'Cota de armazenamento insuficiente. Exclua alguns arquivos para liberar espaço'
     uploadError.value = message
     file.value = null
-    videoPreview.value = null
+    filePreview.value = null
     useToastStore().show(message, 'warning')
     return
   }
 
   if (!title.value) {
-    title.value = selected.name.replace(/\.[^/.]+$/, '').slice(0, 95)
+    title.value = selected.name.replace(/\.[^/.]+$/, '').slice(0, 70)
   }
 
   file.value = selected
   uploadError.value = ''
-  if (videoPreview.value) {
-    URL.revokeObjectURL(videoPreview.value)
+  if (filePreview.value) {
+    URL.revokeObjectURL(filePreview.value)
   }
-  videoPreview.value = URL.createObjectURL(selected)
+  filePreview.value = URL.createObjectURL(selected)
 }
 
 const handleFileChange = (e: Event) => {
@@ -95,8 +90,7 @@ const handleUpload = async () => {
   uploadError.value = ''
   try {
     const { data: signedUrlData } = await api.post('/v1/videos/upload', {
-      fileName: title.value.slice(0, 95),
-      size: file.value.size,
+      fileName: title.value.slice(0, 70),
       contentType: file.value.type,
       fileSize: file.value.size,
     })
@@ -117,21 +111,21 @@ const handleUpload = async () => {
         if (xhr.status >= 200 && xhr.status < 300) {
           resolve(null)
         } else {
-          reject(new Error('Erro ao enviar vídeo.'))
+          reject(new Error('Erro ao enviar arquivo.'))
         }
       }
-      xhr.onerror = () => reject(new Error('Erro ao enviar vídeo.'))
+      xhr.onerror = () => reject(new Error('Erro ao enviar arquivo.'))
       xhr.send(file.value)
     })
-    await api.patch(`/v1/videos/upload/${signedUrlData.videoId}/register-uploaded`)
-    if (videoPreview.value) {
-      URL.revokeObjectURL(videoPreview.value)
-      videoPreview.value = null
+    await api.patch(`/v1/videos/upload/${signedUrlData.fileId}/register-uploaded`)
+    if (filePreview.value) {
+      URL.revokeObjectURL(filePreview.value)
+      filePreview.value = null
     }
 
     router.push({ name: 'list-videos' })
   } catch (e: any) {
-    uploadError.value = e?.response?.data?.message || e?.message || 'Erro ao enviar vídeo.'
+    uploadError.value = e?.response?.data?.message || e?.message || 'Erro ao enviar arquivo.'
   } finally {
     uploading.value = false
     uploadingProgress.value = 0
@@ -142,8 +136,8 @@ const handleUpload = async () => {
 <template>
   <main class="mx-auto inline px-4 py-8">
     <section class="mb-8 text-center">
-      <h1 class="mb-4 text-3xl font-bold">Enviar Novo Vídeo</h1>
-      <p class="mb-6 text-lg">Preencha o título e selecione o vídeo para upload temporário.</p>
+      <h1 class="mb-4 text-3xl font-bold">Enviar Novo Arquivo</h1>
+      <p class="mb-6 text-lg">Preencha o título e selecione o arquivo para upload temporário.</p>
     </section>
 
     <form class="mx-auto max-w-lg rounded-lg p-6 shadow" @submit.prevent="handleUpload">
@@ -152,14 +146,14 @@ const handleUpload = async () => {
         <input
           :readonly="uploading"
           v-model="title"
-          @input="title = title.slice(0, 95)"
+          @input="title = title.slice(0, 70)"
           class="w-full rounded border px-3 py-2"
           required
         />
       </div>
 
       <div class="mb-4">
-        <label class="mb-1 block font-semibold">Arquivo de Vídeo</label>
+        <label class="mb-1 block font-semibold">Arquivo</label>
 
         <!-- Área de drag-and-drop -->
         <div
@@ -167,16 +161,16 @@ const handleUpload = async () => {
           @dragover="handleDragOver"
           @drop="handleDrop"
         >
-          <p class="mb-2">Arraste e solte o vídeo aqui, ou</p>
+          <p class="mb-2">Arraste e solte o arquivo aqui, ou</p>
 
           <label
             class="relative mx-auto flex cursor-pointer items-center gap-2 rounded border border-blue-400 px-4 py-2 font-semibold shadow"
           >
-            <span>Selecionar vídeo</span>
+            <span>Selecionar arquivo</span>
             <input
               type="file"
               :disabled="uploading"
-              accept="video/mp4,video/x-msvideo,video/x-matroska,video/quicktime,video/x-ms-wmv,video/mp2t"
+              :accept="allowedMimeTypes.join(',')"
               @change="handleFileChange"
               class="absolute top-0 left-0 h-full w-full cursor-pointer opacity-0 disabled:cursor-not-allowed"
             />
@@ -187,8 +181,28 @@ const handleUpload = async () => {
           }}</span>
         </div>
 
-        <div v-if="videoPreview" class="mt-4 flex justify-center">
-          <video :src="videoPreview" controls class="max-h-64 rounded border shadow" />
+        <div v-if="filePreview && file" class="mt-4 flex justify-center">
+          <template v-if="file.type.startsWith('video')">
+            <video :src="filePreview" controls class="max-h-64 rounded border shadow" />
+          </template>
+          <template v-else-if="file.type === 'image/jpg' || file.type === 'image/jpeg'">
+            <img
+              :src="filePreview"
+              alt="Pré-visualização da imagem"
+              class="max-h-64 rounded border shadow"
+            />
+          </template>
+          <template v-else-if="file.type === 'application/pdf'">
+            <iframe
+              :src="filePreview"
+              class="mx-auto mb-4 max-w-full rounded shadow"
+              style="width: 100%; height: 500px; border: none"
+              title="Pré-visualização do PDF"
+            />
+          </template>
+          <template v-else>
+            <span class="text-sm">Pré-visualização não disponível para este tipo de arquivo.</span>
+          </template>
         </div>
       </div>
 
@@ -209,7 +223,7 @@ const handleUpload = async () => {
         :disabled="uploading"
         class="w-full rounded bg-blue-600 py-2 font-semibold text-white disabled:opacity-50 hover:disabled:cursor-not-allowed"
       >
-        {{ uploading ? 'Enviando...' : 'Enviar Vídeo' }}
+        {{ uploading ? 'Enviando...' : 'Enviar Arquivo' }}
       </button>
     </form>
   </main>

@@ -13,7 +13,7 @@ public class UserSettingsProjection {
 	
 	private Long storageLimitBytes;
 
-    private Integer maxVideoRetentionDays;
+    private Integer maxFileRetentionDays;
 
     private ZonedDateTime modifiedAt;
 }

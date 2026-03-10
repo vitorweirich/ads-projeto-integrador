@@ -4,7 +4,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.github.fileshare.services.SchedulerService;
-import com.github.fileshare.services.VideoStorageService;
+import com.github.fileshare.services.FileStorageService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 public class RemoveExpiredLinksScheduler {
 
 	private final SchedulerService service;
-	private final VideoStorageService videoStorageService;
+	private final FileStorageService fileStorageService;
 	
 	// TODO: Adicionar shedlock
 	@Scheduled(cron = "0 */10 * * * *")
@@ -22,13 +22,13 @@ public class RemoveExpiredLinksScheduler {
     }
 	
 	@Scheduled(cron = "0 */10 * * * *")
-    public void removeNotUploadedVideos() {
-		service.removeNotUploadedVideos();
+    public void removeNotUploadedFiles() {
+		service.removeNotUploadedFiles();
     }
 	
 	@Scheduled(cron = "0 */10 * * * *")
-    public void removeExpiredVideos() {
-		videoStorageService.removeExpiredVideos();
+    public void removeExpiredFiles() {
+		fileStorageService.removeExpiredFiles();
     }
 	
 }

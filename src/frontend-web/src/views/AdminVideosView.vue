@@ -18,6 +18,8 @@ type Video = {
 // TODO: Verificação periódica de uso de armazenamento global no storage
 // TODO: Implementar limite/controle de armazenamento por usuario?
 
+// TODO: Implementar pré-visualização de arquivos com base no tipo (ex: imagens, vídeos, etc)
+
 const videos = ref<Video[]>([])
 const loading = ref(true)
 const error = ref('')

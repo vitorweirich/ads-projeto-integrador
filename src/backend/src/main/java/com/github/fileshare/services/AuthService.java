@@ -190,8 +190,8 @@ public class AuthService {
         
         UserSettingsEntity userSettings = new UserSettingsEntity();
         userSettings.setUser(user);
-        userSettings.setStorageLimitBytes(storageProperties.getDefaultMaxPerUser());
-        userSettings.setMaxVideoRetentionDays(storageProperties.getDefaultMaxVideoRetentionDays());
+        userSettings.setStorageLimitBytes(storageProperties.getDefaultMaxStorageUsagePerUser());
+        userSettings.setMaxFileRetentionDays(storageProperties.getDefaultMaxFileRetentionDays());
         userSettingsRepository.save(userSettings);
         
         temporaryUserRepository.delete(usuarioTemp);

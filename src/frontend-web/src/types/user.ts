@@ -9,7 +9,7 @@ export type AdminUserProjection = {
   totalSize: number
   settings: {
     storageLimitBytes: number
-    maxVideoRetentionDays: number
+    maxFileRetentionDays: number
     modifiedAt: string
   }
   usedQuota: string

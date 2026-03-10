@@ -7,7 +7,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
-import com.github.fileshare.config.entities.UploadedVideoEntity;
+import com.github.fileshare.config.entities.UploadedFileEntity;
 import com.github.fileshare.config.entities.UserEntity;
 import com.github.fileshare.config.entities.UserSettingsEntity;
 
@@ -38,9 +38,9 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 
         // Subquery para soma do tamanho dos vídeos por usuário
         Subquery<Long> subquery = cq.subquery(Long.class);
-        Root<UploadedVideoEntity> video = subquery.from(UploadedVideoEntity.class);
-        subquery.select(cb.coalesce(cb.sum(video.get("size")), 0L));
-        subquery.where(cb.equal(video.get("user").get("id"), user.get("id")));
+        Root<UploadedFileEntity> file = subquery.from(UploadedFileEntity.class);
+        subquery.select(cb.coalesce(cb.sum(file.get("size")), 0L));
+        subquery.where(cb.equal(file.get("user").get("id"), user.get("id")));
         
         Join<UserEntity, UserSettingsEntity> settingsJoin = user.join("settings", JoinType.LEFT);
 
@@ -63,7 +63,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 		    user.get("createdAt").alias("createdAt"),
 		    subquery.getSelection().alias("totalSize"),
 		    settingsJoin.get("storageLimitBytes").alias("settingStorageLimitBytes"),
-		    settingsJoin.get("maxVideoRetentionDays").alias("settingMaxVideoRetentionDays"),
+		    settingsJoin.get("maxFileRetentionDays").alias("settingMaxFileRetentionDays"),
 		    settingsJoin.get("modifiedAt").alias("settingModifiedAt")
 		);
         

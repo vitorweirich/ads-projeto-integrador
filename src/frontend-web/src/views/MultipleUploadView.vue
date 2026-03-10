@@ -118,7 +118,7 @@ const handleUpload = async () => {
         xhr.send(file)
       })
 
-      await api.patch(`/v1/videos/upload/${signedUrlData.videoId}/register-uploaded`)
+      await api.patch(`/v1/videos/upload/${signedUrlData.fileId}/register-uploaded`)
       URL.revokeObjectURL(videoPreviews.value[i])
     }
 

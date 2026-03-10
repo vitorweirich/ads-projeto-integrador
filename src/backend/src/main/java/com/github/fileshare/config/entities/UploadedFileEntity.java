@@ -19,9 +19,9 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "UPLOADED_VIDEOS")
+@Table(name = "UPLOADED_FILES")
 @EntityListeners(AuditingEntityListener.class)
-public class UploadedVideoEntity {
+public class UploadedFileEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,6 +48,9 @@ public class UploadedVideoEntity {
 	private String originalUrl;
 
 	private String shortUrlHash;
-	
+    
 	private ZonedDateTime expiresIn;
+
+	@Column(name = "content_type")
+	private String contentType;
 }

@@ -44,10 +44,11 @@ AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY_ENV:minioadmin}
 CLOUDFLARE_R2_ENDPOINT: ${CLOUDFLARE_R2_ENDPOINT_ENV:http://localhost:9000}
 
 storage:
-  default-max-per-user: ${STORAGE_MAX_PER_USER:2147483648} # 2 GB
-  default-max-video-retention-days: ${STORAGE_MAX_RETENTION_DAYS:30}
+  # TODO: Alterar esses valores só tem efeito em novos usuários criados
+  default-max-storage-usage-per-user: ${STORAGE_MAX_STORAGE_USAGE_PER_USER:2147483648} # 2 GB
+  default-max-file-retention-days: ${STORAGE_MAX_FILE_RETENTION_DAYS:30}
   # TODO: Colocar limite mais baixa, bater com o limite do bucket
-  max-total: ${STORAGE_MAX_TOTAL:107374182400} # 100 GB
+  max-storage-usage-total: ${STORAGE_MAX_USAGE_TOTAL:107374182400} # 100 GB
 
 admin:
   admin-emails: ${ADMIN_EMAILS:weirichvitor@gmail.com}

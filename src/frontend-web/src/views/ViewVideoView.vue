@@ -13,9 +13,10 @@ const videoData = ref<{
   signedUrl: string
   watchUrl: string
   metadata: {
-    videoName?: string
+    fileName?: string
+    fileType: string
   }
-  videoId: number
+  fileId: number
   expirationDate: string
 } | null>(null)
 const copied = ref(false)
@@ -30,12 +31,12 @@ const fetchVideo = async () => {
     const { data } = await api.get(`/v1/videos/${route.params.id}`)
     videoData.value = {
       ...data,
-      watchUrl: `${window.location.origin}/watch-v2/${data.signedUrl?.split('/').at(-1)}`,
+      watchUrl: `${window.location.origin}/watch/${data.signedUrl?.split('/').at(-1)}`,
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
-    error.value = e?.response?.data?.message || 'Erro ao carregar vídeo.'
+    error.value = e?.response?.data?.message || 'Erro ao carregar arquivo.'
   } finally {
     loading.value = false
   }
@@ -44,7 +45,7 @@ const fetchVideo = async () => {
 const confirmDeleteVideo = async () => {
   deleteStatus.value = 'loading'
   try {
-    await api.delete(`/v1/videos/${videoData?.value?.videoId}`)
+    await api.delete(`/v1/videos/${videoData?.value?.fileId}`)
     deleteStatus.value = 'success'
 
     setTimeout(() => {
@@ -91,14 +92,14 @@ onMounted(fetchVideo)
 <template>
   <main class="container mx-auto w-full flex-col items-center justify-start px-4 py-8">
     <section class="mb-8 text-center">
-      <h1 class="mb-4 text-3xl font-bold">Visualizar Vídeo</h1>
-      <p class="mb-6 text-lg">Compartilhe o video com os links abaixo abaixo.</p>
+      <h1 class="mb-4 text-3xl font-bold">Visualizar Arquivo</h1>
+      <p class="mb-6 text-lg">Compartilhe o arquivo com os links abaixo abaixo.</p>
     </section>
     <section class="w-full rounded-lg p-6 text-center shadow">
-      <div v-if="loading" class="py-8">Carregando vídeo...</div>
+      <div v-if="loading" class="py-8">Carregando arquivo...</div>
       <div v-else-if="error" class="text-error py-8">{{ error }}</div>
       <div v-else>
-        <h2 class="mb-4 text-xl font-semibold">{{ videoData?.metadata?.videoName || 'Vídeo' }}</h2>
+        <h2 class="mb-4 text-xl font-semibold">{{ videoData?.metadata?.fileName || 'Arquivo' }}</h2>
 
         <div class="mb-4 flex flex-col items-center gap-6">
           <div class="flex w-full max-w-xl flex-col gap-2 rounded-lg border p-4 shadow">
@@ -127,7 +128,7 @@ onMounted(fetchVideo)
               </svg>
               <span class="font-medium"> Link direto para download </span>
             </div>
-            <p class="mb-2 text-sm">Use este link para baixar o vídeo.</p>
+            <p class="mb-2 text-sm">Use este link para baixar o arquivo.</p>
             <div class="flex items-center gap-2">
               <input
                 type="text"
@@ -152,48 +153,50 @@ onMounted(fetchVideo)
           </div>
 
           <!-- Card: Link para assistir no navegador -->
-          <div class="flex w-full max-w-xl flex-col gap-2 rounded-lg border p-4 shadow">
-            <div class="mb-2 flex items-center gap-2">
-              <svg
-                class="h-5 w-5"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M14.752 11.168l-6.518-3.651A1 1 0 007 8.618v6.764a1 1 0 001.234.97l6.518-1.868a1 1 0 00.748-.97V12.138a1 1 0 00-.748-.97z"
+          <template v-if="videoData?.metadata?.fileType.startsWith('video') && videoData?.watchUrl">
+            <div class="flex w-full max-w-xl flex-col gap-2 rounded-lg border p-4 shadow">
+              <div class="mb-2 flex items-center gap-2">
+                <svg
+                  class="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M14.752 11.168l-6.518-3.651A1 1 0 007 8.618v6.764a1 1 0 001.234.97l6.518-1.868a1 1 0 00.748-.97V12.138a1 1 0 00-.748-.97z"
+                  />
+                </svg>
+                <span class="font-medium"> Link para assistir no navegador </span>
+              </div>
+              <p class="mb-2 text-sm">
+                Use este link para assistir ao vídeo diretamente no navegador.
+              </p>
+              <div class="flex items-center gap-2">
+                <input
+                  type="text"
+                  :value="videoData.watchUrl"
+                  readonly
+                  class="flex-1 rounded border px-2 py-1 text-sm focus:outline-none"
+                  @focus="(e: any) => e.target.select()"
                 />
-              </svg>
-              <span class="font-medium"> Link para assistir no navegador </span>
+                <button
+                  class="rounded px-3 py-1 text-sm transition"
+                  @click="copyLink(videoData.watchUrl)"
+                >
+                  Copiar
+                </button>
+                <button
+                  class="rounded px-3 py-1 text-sm transition"
+                  @click="openLinkInNewTab(videoData.watchUrl)"
+                >
+                  Ver em nova aba
+                </button>
+              </div>
             </div>
-            <p class="mb-2 text-sm">
-              Use este link para assistir ao vídeo diretamente no navegador.
-            </p>
-            <div class="flex items-center gap-2">
-              <input
-                type="text"
-                :value="videoData.watchUrl"
-                readonly
-                class="flex-1 rounded border px-2 py-1 text-sm focus:outline-none"
-                @focus="(e: any) => e.target.select()"
-              />
-              <button
-                class="rounded px-3 py-1 text-sm transition"
-                @click="copyLink(videoData.watchUrl)"
-              >
-                Copiar
-              </button>
-              <button
-                class="rounded px-3 py-1 text-sm transition"
-                @click="openLinkInNewTab(videoData.watchUrl)"
-              >
-                Ver em nova aba
-              </button>
-            </div>
-          </div>
+          </template>
 
           <span v-if="copied" class="mt-2 text-sm">Link copiado!</span>
           <div
@@ -220,35 +223,66 @@ onMounted(fetchVideo)
           </div>
         </div>
         <div class="mb-6 flex justify-center">
-          <div
-            class="flex max-w-2xl items-center gap-3 rounded-lg border border-amber-300 px-6 py-4 shadow-sm"
+          <template
+            v-if="videoData?.metadata?.fileType.startsWith('video') && videoData?.signedUrl"
           >
-            <svg
-              class="h-6 w-6"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              viewBox="0 0 24 24"
+            <div
+              class="flex max-w-2xl items-center gap-3 rounded-lg border border-amber-300 px-6 py-4 shadow-sm"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z"
-              />
-            </svg>
-            <span class="text-base font-medium">
-              Este vídeo é apenas um <span class="font-semibold">preview</span> para você.<br />
-              Para compartilhar com outras pessoas, utilize um dos links acima.
-            </span>
-          </div>
+              <svg
+                class="h-6 w-6"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z"
+                />
+              </svg>
+              <span class="text-base font-medium">
+                A seção abaixo é um <span class="font-semibold">preview</span> para você.<br />
+                Para compartilhar com outras pessoas, utilize um dos links acima.
+              </span>
+            </div>
+          </template>
         </div>
-        <video
-          v-if="videoData?.signedUrl"
-          :src="videoData.signedUrl"
-          controls
-          class="mx-auto mb-4 max-w-full rounded shadow"
-        />
-        <div v-else class="">Vídeo não disponível.</div>
+        <div class="mb-6 flex justify-center">
+          <!-- TODO: Componentizar e criar uma factory -->
+          <template
+            v-if="videoData?.signedUrl && videoData?.metadata?.fileType.startsWith('video')"
+          >
+            <video
+              :src="videoData.signedUrl"
+              controls
+              class="mx-auto mb-4 max-w-full rounded shadow"
+            />
+          </template>
+          <template
+            v-else-if="videoData?.signedUrl && videoData?.metadata?.fileType.startsWith('image')"
+          >
+            <img
+              :src="videoData.signedUrl"
+              alt="Pré-visualização da imagem"
+              class="mx-auto mb-4 max-w-full rounded shadow"
+            />
+          </template>
+          <template
+            v-else-if="videoData?.signedUrl && videoData?.metadata?.fileType === 'application/pdf'"
+          >
+            <iframe
+              :src="videoData.signedUrl"
+              class="mx-auto mb-4 max-w-full rounded shadow"
+              style="width: 100%; height: 500px; border: none"
+              title="Pré-visualização do PDF"
+            />
+          </template>
+          <template v-else>
+            <span class="text-sm">Pré-visualização não disponível para este tipo de arquivo.</span>
+          </template>
+        </div>
       </div>
     </section>
 
@@ -264,8 +298,8 @@ onMounted(fetchVideo)
       @confirm="confirmDeleteVideo"
     >
       <p>
-        Deseja realmente <span class="font-semibold text-red-600">excluir</span> o vídeo
-        <strong>{{ videoData?.metadata?.videoName }}</strong
+        Deseja realmente <span class="font-semibold text-red-600">excluir</span> o arquivo
+        <strong>{{ videoData?.metadata?.fileName }}</strong
         >?
       </p>
     </ConfirmationModal>

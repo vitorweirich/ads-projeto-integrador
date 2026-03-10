@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.github.fileshare.dto.request.ListFilesRequestParams;
 import com.github.fileshare.dto.request.ListUsersRequestParams;
-import com.github.fileshare.dto.request.ListVideosRequestParams;
-import com.github.fileshare.dto.response.AdminVideoSignedUrl;
+import com.github.fileshare.dto.response.AdminFileSignedUrl;
 import com.github.fileshare.dto.response.CompleteUserDTO;
-import com.github.fileshare.dto.response.VideoDTO;
+import com.github.fileshare.dto.response.FileDTO;
 import com.github.fileshare.services.AdminService;
 
 import jakarta.validation.Valid;
@@ -44,20 +44,20 @@ public class AdminController {
     }
 	
 	@GetMapping("/videos")
-    public ResponseEntity<Page<VideoDTO>> listVideos(@Valid @ModelAttribute ListVideosRequestParams params) {
+    public ResponseEntity<Page<FileDTO>> listFiles(@Valid @ModelAttribute ListFilesRequestParams params) {
 
-        return ResponseEntity.ok(adminService.listVideos(params));
+        return ResponseEntity.ok(adminService.listFiles(params));
     }
 	
-	@GetMapping("/videos/{videoId}")
-    public ResponseEntity<AdminVideoSignedUrl> getVideo(@PathVariable Long videoId) {
+	@GetMapping("/videos/{fileId}")
+    public ResponseEntity<AdminFileSignedUrl> getFile(@PathVariable Long fileId) {
 
-        return ResponseEntity.ok(adminService.getVideo(videoId));
+        return ResponseEntity.ok(adminService.getFile(fileId));
     }
 	
-	@DeleteMapping("/videos/{videoId}")
-	public ResponseEntity<Void> deleteVideo(@PathVariable Long videoId) {
-		adminService.deleteVideo(videoId);
+	@DeleteMapping("/videos/{fileId}")
+	public ResponseEntity<Void> deleteFile(@PathVariable Long fileId) {
+		adminService.deleteFile(fileId);
 		
 		return ResponseEntity.noContent().build();
 	}

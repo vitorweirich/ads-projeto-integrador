@@ -128,7 +128,8 @@ describe('Header Navigation', () => {
       cy.get('[data-cy="admin-users-link"]').should('exist')
     })
 
-    it('clicar no link de administrar videos redireciona para a página de administrar videos', () => {
+    // TODO: Ajustar testIds
+    it('clicar no link de administrar arquivos redireciona para a página de administrar arquivos', () => {
       cy.get('[data-cy="admin-videos-link"]').click()
       cy.url().should('include', '/admin/videos')
     })

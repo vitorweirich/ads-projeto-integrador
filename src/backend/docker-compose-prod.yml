@@ -26,11 +26,11 @@ services:
       AWS_ACCESS_KEY_ID_ENV: ${AWS_ACCESS_KEY_ID_ENV}
       AWS_SECRET_ACCESS_KEY_ENV: ${AWS_SECRET_ACCESS_KEY_ENV}
       CLOUDFLARE_R2_ENDPOINT_ENV: ${CLOUDFLARE_R2_ENDPOINT_ENV}
-      MAGIC_LINK_BASE_URL: ${MAGIC_LINK_BASE_URL:-https://videos.vitorweirich.com}
-      CONFIRMATION_BASE_URL: ${CONFIRMATION_BASE_URL:-https://videos.vitorweirich.com/v1/api/auth/confirm}
+      MAGIC_LINK_BASE_URL: ${MAGIC_LINK_BASE_URL:-https://files.vitorweirich.com}
+      CONFIRMATION_BASE_URL: ${CONFIRMATION_BASE_URL:-https://files.vitorweirich.com/v1/api/auth/confirm}
       CONFIRMATION_EXPIRATION_MINUTES: ${CONFIRMATION_EXPIRATION_MINUTES:-1440}
-      SHORT_URL_BASE_URL: ${SHORT_URL_BASE_URL:-https://videos.vitorweirich.com/v1/share-url}
-      RESET_PASSWORD_BASE_URL: ${RESET_PASSWORD_BASE_URL:-https://videos-ui.vitorweirich.com/reset-password}
+      SHORT_URL_BASE_URL: ${SHORT_URL_BASE_URL:-https://files.vitorweirich.com/v1/share-url}
+      RESET_PASSWORD_BASE_URL: ${RESET_PASSWORD_BASE_URL:-https://files-ui.vitorweirich.com/reset-password}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 30s

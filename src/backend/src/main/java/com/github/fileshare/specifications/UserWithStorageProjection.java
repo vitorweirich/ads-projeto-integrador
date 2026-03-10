@@ -32,8 +32,8 @@ public class UserWithStorageProjection {
     public void setSettingStorageLimitBytes(Long storageLimitBytes) {
     	settings.setStorageLimitBytes(storageLimitBytes);
     }
-    public void setSettingMaxVideoRetentionDays(Integer maxVideoRetentionDays) {
-    	settings.setMaxVideoRetentionDays(maxVideoRetentionDays);
+    public void setSettingMaxFileRetentionDays(Integer maxFileRetentionDays) {
+    	settings.setMaxFileRetentionDays(maxFileRetentionDays);
     }
     public void setSettingModifiedAt(ZonedDateTime modifiedAt) {
     	settings.setModifiedAt(modifiedAt);

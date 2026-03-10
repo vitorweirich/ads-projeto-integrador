@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AdminVideoSignedUrl {
+public class AdminFileSignedUrl {
 	
 	private String signedUrl;
 	

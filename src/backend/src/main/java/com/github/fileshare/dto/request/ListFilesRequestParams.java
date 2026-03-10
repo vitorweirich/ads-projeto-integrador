@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class ListVideosRequestParams extends PaginationRequestParams {
+public class ListFilesRequestParams extends PaginationRequestParams {
 	
 	private Boolean uploaded;
 	

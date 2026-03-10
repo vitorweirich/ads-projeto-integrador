@@ -51,15 +51,10 @@ const router = createRouter({
       props: true,
     },
     {
-      path: '/watch-v2/:id',
+      path: '/watch/:id',
       name: 'VideoPlayerViewV2',
       component: () => import('../views/VideoPlayerViewV2.vue'),
       props: true,
-    },
-    {
-      path: '/watch/:id',
-      name: 'VideoPlayerView',
-      component: () => import('@/views/VideoPlayerView.vue'),
     },
     {
       path: '/verify-mfa',

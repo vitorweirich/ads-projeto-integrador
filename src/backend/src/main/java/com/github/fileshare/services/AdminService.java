@@ -14,18 +14,18 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import com.github.fileshare.config.entities.UploadedVideoEntity;
+import com.github.fileshare.config.entities.UploadedFileEntity;
 import com.github.fileshare.config.entities.UserEntity;
 import com.github.fileshare.dto.request.ListUsersRequestParams;
-import com.github.fileshare.dto.request.ListVideosRequestParams;
-import com.github.fileshare.dto.response.AdminVideoSignedUrl;
+import com.github.fileshare.dto.request.ListFilesRequestParams;
+import com.github.fileshare.dto.response.AdminFileSignedUrl;
 import com.github.fileshare.dto.response.CompleteUserDTO;
-import com.github.fileshare.dto.response.VideoDTO;
+import com.github.fileshare.dto.response.FileDTO;
 import com.github.fileshare.exceptions.ResourceNotFoundException;
-import com.github.fileshare.exceptions.VideoNotFoundException;
+import com.github.fileshare.exceptions.FileNotFoundException;
+import com.github.fileshare.mappers.FileMapper;
 import com.github.fileshare.mappers.UserMapper;
-import com.github.fileshare.mappers.VideoMapper;
-import com.github.fileshare.respositories.UploadedVideoRepository;
+import com.github.fileshare.respositories.UploadedFileRepository;
 import com.github.fileshare.respositories.UserRepository;
 import com.github.fileshare.specifications.UserWithStorageProjection;
 import com.github.fileshare.utils.PreSignedUrlUtils;
@@ -45,47 +45,47 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequ
 public class AdminService {
 
 	private final UserRepository userRepository;
-	private final UploadedVideoRepository uploadedVideoRepository;
+	private final UploadedFileRepository uploadedFileRepository;
 	private final UserMapper userMapper;
-	private final VideoMapper videoMapper;
+	private final FileMapper fileMapper;
 	private final S3Presigner presigner;
 	private final S3Client s3Client;
 	
 	private static final Integer ADMIN_SHARE_URL_EXPIRATION_IN_MINUTES = 10;
 	
-	public AdminVideoSignedUrl getVideo(Long videoId) {
-		UploadedVideoEntity video = uploadedVideoRepository.findById(videoId)
-				.orElseThrow(() -> new VideoNotFoundException("Não foi encontrado video de id: " + videoId));
+	public AdminFileSignedUrl getFile(Long fileId) {
+		UploadedFileEntity file = uploadedFileRepository.findById(fileId)
+				.orElseThrow(() -> new FileNotFoundException("Não foi encontrado arquivo de id: " + fileId));
 		
 		GetObjectRequest putObjectRequest = GetObjectRequest.builder()
-                .bucket(VideoServiceImpl.BUCKET_NAME)
-                .key(video.getObjectKey())
+                .bucket(FileServiceImpl.BUCKET_NAME)
+                .key(file.getObjectKey())
                 .build();
 		
 		PresignedGetObjectRequest presignedRequest = presigner.presignGetObject(r -> r.signatureDuration(Duration.ofMinutes(ADMIN_SHARE_URL_EXPIRATION_IN_MINUTES))
         		.getObjectRequest(putObjectRequest));
 		
         return PreSignedUrlUtils.extractTimestampsFromPreSignedUrl(
-        			AdminVideoSignedUrl.builder().signedUrl(presignedRequest.url().toString()).build()
+        			AdminFileSignedUrl.builder().signedUrl(presignedRequest.url().toString()).build()
         		);
 	}
 	
-	public void deleteVideo(Long videoId) {
-		UploadedVideoEntity video = uploadedVideoRepository.findById(videoId)
-				.orElseThrow(() -> new VideoNotFoundException("Não foi encontrado video de id: " + videoId));
+	public void deleteFile(Long fileId) {
+		UploadedFileEntity file = uploadedFileRepository.findById(fileId)
+				.orElseThrow(() -> new FileNotFoundException("Não foi encontrado arquivo de id: " + fileId));
 		
         DeleteObjectRequest deleteRequest = DeleteObjectRequest.builder()
-                .bucket(VideoServiceImpl.BUCKET_NAME)
-                .key(video.getObjectKey())
+                .bucket(FileServiceImpl.BUCKET_NAME)
+                .key(file.getObjectKey())
                 .build();
         
         try {
         	s3Client.deleteObject(deleteRequest);
 		} catch (Exception e) {
-			log.warn("AdminService.deleteVideo - error deleting video from storage - videoId {}", videoId, e);
+			log.warn("AdminService.deleteFile - error deleting file from storage - fileId {}", fileId, e);
 		}
         
-        uploadedVideoRepository.delete(video);
+        uploadedFileRepository.delete(file);
 	}
 	
 	public Page<CompleteUserDTO> listUsers(ListUsersRequestParams params) {
@@ -111,32 +111,32 @@ public class AdminService {
 		userRepository.save(user);
 	}
 	
-	public Page<VideoDTO> listVideos(ListVideosRequestParams params) {
+	public Page<FileDTO> listFiles(ListFilesRequestParams params) {
 		PageRequest pageable = PageRequest.of(params.getPage(), params.getRows(), Sort.by(Direction.ASC, "createdAt"));
 		
-		Page<UploadedVideoEntity> findAll = uploadedVideoRepository.findAll(this.createListVideoSpecification(params), pageable);
+		Page<UploadedFileEntity> findAll = uploadedFileRepository.findAll(this.createListFileSpecification(params), pageable);
 		
 		ZonedDateTime now = ZonedDateTime.now();
 		
-		final List<UploadedVideoEntity> videosWithExpiredLink = new ArrayList<>();
+		final List<UploadedFileEntity> filesWithExpiredLink = new ArrayList<>();
 		
-		List<VideoDTO> content = findAll.getContent().stream().map(video -> {
-			if(Objects.nonNull(video.getExpiresIn()) && now.isAfter(video.getExpiresIn())) {
-				video.setShareUrl(null);
-				video.setExpiresIn(null);
-				videosWithExpiredLink.add(video);
+		List<FileDTO> content = findAll.getContent().stream().map(file -> {
+			if(Objects.nonNull(file.getExpiresIn()) && now.isAfter(file.getExpiresIn())) {
+				file.setShareUrl(null);
+				file.setExpiresIn(null);
+				filesWithExpiredLink.add(file);
 			}
-			return videoMapper.toDto(video);
+			return fileMapper.toDto(file);
 		}).toList();
 		
-		if(!videosWithExpiredLink.isEmpty()) {
-			uploadedVideoRepository.saveAll(videosWithExpiredLink);
+		if(!filesWithExpiredLink.isEmpty()) {
+			uploadedFileRepository.saveAll(filesWithExpiredLink);
 		}
 		
-		return new PageImpl<VideoDTO>(content, pageable, findAll.getTotalElements());
+		return new PageImpl<FileDTO>(content, pageable, findAll.getTotalElements());
 	}
 	
-	private Specification<UploadedVideoEntity> createListVideoSpecification(ListVideosRequestParams params) {
+	private Specification<UploadedFileEntity> createListFileSpecification(ListFilesRequestParams params) {
 		return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
             

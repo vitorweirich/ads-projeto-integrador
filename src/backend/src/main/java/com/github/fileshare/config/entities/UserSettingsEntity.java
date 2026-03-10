@@ -32,7 +32,7 @@ public class UserSettingsEntity {
 
     private Long storageLimitBytes;
 
-    private Integer maxVideoRetentionDays;
+    private Integer maxFileRetentionDays;
 
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId

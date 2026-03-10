@@ -7,7 +7,7 @@ participant "API" as API
 database "Banco de Dados" as DB
 collections "Storage (S3/R2)" as ST
 
-V -> FE: Abre /watch-v2/{shortId}
+V -> FE: Abre /watch/{shortId}
 FE -> API: GET /v1/share-url/{shortId}?jsonResponse=true
 API -> DB: Resolve shortId -> URL original
 DB --> API: URL assinada/original

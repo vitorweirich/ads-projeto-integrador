@@ -16,7 +16,7 @@ import com.github.fileshare.config.entities.UserSettingsEntity;
 import com.github.fileshare.dto.response.StorageDetails;
 import com.github.fileshare.dto.response.UserInfoDTO;
 import com.github.fileshare.exceptions.ResourceNotFoundException;
-import com.github.fileshare.respositories.UploadedVideoRepository;
+import com.github.fileshare.respositories.UploadedFileRepository;
 import com.github.fileshare.respositories.UserRepository;
 import com.github.fileshare.respositories.UserSettingsRepository;
 import com.github.fileshare.utils.AuthenticatedUserUtils;
@@ -28,7 +28,7 @@ import lombok.RequiredArgsConstructor;
 public class UserService implements UserDetailsService {
     
     private final UserRepository userRepository;
-    private final UploadedVideoRepository uploadedVideoRepository;
+    private final UploadedFileRepository uploadedFileRepository;
     private final UserSettingsRepository userSettingsRepository;
     private final AdminEmailAccessEvaluator adminEmailAccessEvaluator;
     
@@ -44,7 +44,7 @@ public class UserService implements UserDetailsService {
     	
     	// TODO: Fazer em paralelo
     	UserSettingsEntity userSettings = userSettingsRepository.findById(user.getId()).orElseThrow(() -> new ResourceNotFoundException("Unable to retrieve user settings!"));
-    	Long usedQuota = uploadedVideoRepository.sumSizeByUserId(user.getId()).orElse(0L);
+    	Long usedQuota = uploadedFileRepository.sumSizeByUserId(user.getId()).orElse(0L);
     	
     	userInfoDTO.setStorage(
     			new StorageDetails(userSettings.getStorageLimitBytes(), usedQuota)
@@ -100,9 +100,9 @@ public class UserService implements UserDetailsService {
 	public void deleteAccount() {
         UserEntity user = AuthenticatedUserUtils.requireEnrichedUser();
 
-        // TODO: Deletar os videos do storage para liberar espaço (pode ser async e opcional em caso de falha)
-        // OBS: Em caso de implementação de videos sem expiração a remoção NÃO pode ser opcional.
-        uploadedVideoRepository.deleteByUserId(user.getId());
+        // TODO: Deletar os arquivos do storage para liberar espaço (pode ser async e opcional em caso de falha)
+        // OBS: Em caso de implementação de arquivos sem expiração a remoção NÃO pode ser opcional.
+        uploadedFileRepository.deleteByUserId(user.getId());
         // Delete the managed entity to ensure JPA cascades/orphanRemoval are applied
         userRepository.delete(user);
 	}

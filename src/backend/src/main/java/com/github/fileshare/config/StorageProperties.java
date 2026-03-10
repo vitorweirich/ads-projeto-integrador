@@ -13,12 +13,12 @@ public class StorageProperties {
     /**
      * Limite máximo de armazenamento por usuário (em bytes)
      */
-    private long defaultMaxPerUser;
+    private long defaultMaxStorageUsagePerUser;
     
-    private int defaultMaxVideoRetentionDays;
+    private int defaultMaxFileRetentionDays;
 
     /**
      * Limite máximo de armazenamento total do sistema (em bytes)
      */
-    private long maxTotal;
+    private long maxStorageUsageTotal;
 }

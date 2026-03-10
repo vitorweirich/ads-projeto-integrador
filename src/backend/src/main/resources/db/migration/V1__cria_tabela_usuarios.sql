@@ -8,3 +8,13 @@ CREATE TABLE USERS (
     mfa_verified BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP(6) WITH TIME ZONE
 );
+
+CREATE INDEX user_email_index ON USERS (email);
+
+CREATE TABLE USER_SETTINGS (
+    user_id BIGINT NOT NULL PRIMARY KEY,
+    storage_limit_bytes BIGINT NOT NULL DEFAULT 2147483648,
+    max_file_retention_days INT NOT NULL DEFAULT 1,
+    modified_at TIMESTAMP(6) WITH TIME ZONE,
+    CONSTRAINT fk_user_settings_user FOREIGN KEY (user_id) REFERENCES USERS(id)
+);

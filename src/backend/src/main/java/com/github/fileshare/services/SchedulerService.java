@@ -4,6 +4,6 @@ public interface SchedulerService {
 
 	public void removeExpiredLinks();
 	
-	public void removeNotUploadedVideos();
+	public void removeNotUploadedFiles();
 	
 }

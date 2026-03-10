@@ -134,7 +134,7 @@ public class MfaService {
     }
 
     private String getOtpAuthUrl(String username, String secret) {
-        String issuer = "App Videos"; // Nome do seu app
+        String issuer = "FileShare"; // Nome do seu app
         return String.format("otpauth://totp/%s:%s?secret=%s&issuer=%s",
                 issuer, username, secret, issuer);
     }

@@ -48,7 +48,7 @@ const logout = () => {
           <template v-if="isAdmin">
             <li>
               <router-link to="/admin/videos" data-cy="admin-videos-link">
-                Administrar Vídeos
+                Administrar Arquivos
               </router-link>
             </li>
             <li>

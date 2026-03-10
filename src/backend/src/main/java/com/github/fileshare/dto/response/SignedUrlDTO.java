@@ -18,7 +18,7 @@ public class SignedUrlDTO {
 	
 	private Map<String, Object> metadata;
 	
-	private Long videoId;
+	private Long fileId;
 	
 	private ZonedDateTime expirationDate;
 

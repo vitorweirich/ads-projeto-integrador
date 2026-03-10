@@ -12,33 +12,33 @@ import org.springframework.data.repository.ListPagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.github.fileshare.config.entities.UploadedVideoEntity;
+import com.github.fileshare.config.entities.UploadedFileEntity;
 
 import jakarta.transaction.Transactional;
 
 @Repository
-public interface UploadedVideoRepository extends JpaRepository<UploadedVideoEntity, Long>,
-	ListPagingAndSortingRepository<UploadedVideoEntity, Long>, JpaSpecificationExecutor<UploadedVideoEntity> {
+public interface UploadedFileRepository extends JpaRepository<UploadedFileEntity, Long>,
+	ListPagingAndSortingRepository<UploadedFileEntity, Long>, JpaSpecificationExecutor<UploadedFileEntity> {
 	
-	@Query("SELECT SUM(v.size) FROM UploadedVideoEntity v WHERE v.user.id = :userId")
+	@Query("SELECT SUM(v.size) FROM UploadedFileEntity v WHERE v.user.id = :userId")
 	Optional<Long> sumSizeByUserId(@Param("userId") Long userId);
 
-	@Query("SELECT SUM(v.size) FROM UploadedVideoEntity v")
+	@Query("SELECT SUM(v.size) FROM UploadedFileEntity v")
 	Optional<Long> sumAllSizes();
 
 	@Transactional
 	@Modifying
-    @Query(value = "DELETE FROM UPLOADED_VIDEOS WHERE uploaded = false AND created_at < ?1", nativeQuery = true)
+    @Query(value = "DELETE FROM UPLOADED_FILES WHERE uploaded = false AND created_at < ?1", nativeQuery = true)
     int deleteByNotUploaded(ZonedDateTime now);
 	
-	List<UploadedVideoEntity> findByCreatedAtBefore(ZonedDateTime dateTime);
+	List<UploadedFileEntity> findByCreatedAtBefore(ZonedDateTime dateTime);
 	
 	@Transactional
 	@Modifying
-	@Query(value = "UPDATE UPLOADED_VIDEOS SET share_url = NULL, short_url_hash = NULL, original_url = NULL, expires_in = NULL WHERE expires_in < :now", nativeQuery = true)
+	@Query(value = "UPDATE UPLOADED_FILES SET share_url = NULL, short_url_hash = NULL, original_url = NULL, expires_in = NULL WHERE expires_in < :now", nativeQuery = true)
 	int updateExpiredLinks(ZonedDateTime now);
 	
-	Optional<UploadedVideoEntity> findByShortUrlHash(String shortUrlHash);
+	Optional<UploadedFileEntity> findByShortUrlHash(String shortUrlHash);
 
 	@Transactional
 	@Modifying

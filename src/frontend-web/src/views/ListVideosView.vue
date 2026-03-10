@@ -47,7 +47,7 @@ const fetchVideos = async () => {
     videos.value = data.content.map((video: Video) => ({
       ...video,
       watchUrl: video.shareUrl
-        ? `${window.location.origin}/watch-v2/${video.shareUrl?.split('/')?.pop()}`
+        ? `${window.location.origin}/watch/${video.shareUrl?.split('/')?.pop()}`
         : undefined,
     }))
     totalPages.value = data.totalPages || 1
@@ -65,7 +65,7 @@ const fetchVideo = async (id: number) => {
     const { data } = await api.get(`/v1/videos/${id}`)
     const video = {
       ...data,
-      watchUrl: `${window.location.origin}/watch-v2/${data.signedUrl?.split('/').at(-1)}`,
+      watchUrl: `${window.location.origin}/watch/${data.signedUrl?.split('/').at(-1)}`,
     }
     const index = videos.value.findIndex((v) => v.id === id)
     if (index !== -1) {

@@ -35,8 +35,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 				.body(new ErrorResponse("INTERNAL_ERROR", "Erro interno do servidor"));
 	}
 
-	@ExceptionHandler(VideoNotFoundException.class)
-	public ResponseEntity<ErrorResponse> handleVideoNotFoundException(VideoNotFoundException ex) {
+	@ExceptionHandler(FileNotFoundException.class)
+	public ResponseEntity<ErrorResponse> handleFileNotFoundException(FileNotFoundException ex) {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("NOT_FOUND", ex.getMessage()));
 	}
 	

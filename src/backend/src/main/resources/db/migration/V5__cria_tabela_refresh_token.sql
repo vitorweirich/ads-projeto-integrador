@@ -1,5 +1,5 @@
 CREATE TABLE REFRESH_TOKENS (
-    id TEXT PRIMARY KEY,
+    id UUID PRIMARY KEY,
     user_id BIGINT,
     family_id TEXT,
     created_at TIMESTAMP(6) WITH TIME ZONE,

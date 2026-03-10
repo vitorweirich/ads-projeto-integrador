@@ -11,19 +11,21 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class VideoDTO {
+public class FileDTO {
 
 	private Long id;
-	
+    
 	private String name;
-	
+    
 	private Long size;
-	
+    
 	private boolean uploaded;
-	
+    
 	private ZonedDateTime createdAt;
-	
+    
 	private String shareUrl;
-	
+    
 	private ZonedDateTime expiresIn;
+
+	private String contentType;
 }
