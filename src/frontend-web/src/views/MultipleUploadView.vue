@@ -3,23 +3,16 @@ import { ref } from 'vue'
 import api from '@/services/api'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { allowedMimeTypes } from '@/constants/fileTypes'
+import UploadingFilePreview from '@/components/UploadingFilePreview.vue'
 
 const files = ref<File[]>([])
-const videoPreviews = ref<string[]>([])
-const videoNames = ref<string[]>([]) // nomes editáveis
+const filePreviews = ref<string[]>([])
+const fileNames = ref<string[]>([]) // nomes editáveis
 const uploading = ref(false)
 const uploadingProgress = ref<number[]>([])
 const uploadError = ref('')
 const router = useRouter()
-
-const allowedTypes = [
-  'video/mp4',
-  'video/x-msvideo',
-  'video/x-matroska',
-  'video/quicktime',
-  'video/x-ms-wmv',
-  'video/mp2t',
-]
 
 const processFiles = (selectedFiles: FileList | File[]) => {
   const validFiles: File[] = []
@@ -29,22 +22,29 @@ const processFiles = (selectedFiles: FileList | File[]) => {
   // TODO: Validar storage disponivel + exibir toast informativo
 
   Array.from(selectedFiles).forEach((selected) => {
-    if (!allowedTypes.includes(selected.type)) {
+    if (!allowedMimeTypes.includes(selected.type)) {
       uploadError.value = `Formato não suportado: ${selected.name}`
       return
     }
     if (selected.size > 2000 * 1024 * 1024) {
-      uploadError.value = `O vídeo ${selected.name} é maior que 2 GB`
+      uploadError.value = `O arquivo ${selected.name} é maior que 2 GB`
       return
     }
     validFiles.push(selected)
     previews.push(URL.createObjectURL(selected))
-    names.push(selected.name.replace(/\.[^/.]+$/, '').slice(0, 95))
+
+    // TODO: Mover formatacao do nome para um utils e usar tanto aqui quanto no UploadView
+    names.push(
+      selected.name
+        .replace(/\.[^/.]+$/g, '')
+        .replace(/\./g, '_')
+        .slice(0, 70),
+    )
   })
 
   files.value = [...files.value, ...validFiles]
-  videoPreviews.value = [...videoPreviews.value, ...previews]
-  videoNames.value = [...videoNames.value, ...names]
+  filePreviews.value = [...filePreviews.value, ...previews]
+  fileNames.value = [...fileNames.value, ...names]
   uploadingProgress.value = new Array(files.value.length).fill(0)
   uploadError.value = ''
 }
@@ -70,11 +70,11 @@ const handleDragOver = (e: DragEvent) => {
   e.stopPropagation()
 }
 
-const removeVideo = (index: number) => {
-  URL.revokeObjectURL(videoPreviews.value[index])
+const removeFile = (index: number) => {
+  URL.revokeObjectURL(filePreviews.value[index])
   files.value.splice(index, 1)
-  videoPreviews.value.splice(index, 1)
-  videoNames.value.splice(index, 1)
+  filePreviews.value.splice(index, 1)
+  fileNames.value.splice(index, 1)
   uploadingProgress.value.splice(index, 1)
 }
 
@@ -91,8 +91,8 @@ const handleUpload = async () => {
     for (let i = 0; i < files.value.length; i++) {
       const file = files.value[i]
 
-      const { data: signedUrlData } = await api.post('/v1/videos/upload', {
-        fileName: videoNames.value[i].slice(0, 95),
+      const { data: signedUrlData } = await api.post('/v1/files/upload', {
+        fileName: fileNames.value[i].slice(0, 95),
         size: file.size,
         contentType: file.type,
         fileSize: file.size,
@@ -118,14 +118,14 @@ const handleUpload = async () => {
         xhr.send(file)
       })
 
-      await api.patch(`/v1/videos/upload/${signedUrlData.fileId}/register-uploaded`)
-      URL.revokeObjectURL(videoPreviews.value[i])
+      await api.patch(`/v1/files/upload/${signedUrlData.fileId}/register-uploaded`)
+      URL.revokeObjectURL(filePreviews.value[i])
     }
 
     await useAuthStore().fetchUser(true)
-    router.push({ name: 'list-videos' })
+    router.push({ name: 'list-files' })
   } catch (e: any) {
-    uploadError.value = e?.response?.data?.message || e?.message || 'Erro ao enviar vídeos.'
+    uploadError.value = e?.response?.data?.message || e?.message || 'Erro ao enviar arquivos.'
   } finally {
     uploading.value = false
     uploadingProgress.value = []
@@ -135,7 +135,7 @@ const handleUpload = async () => {
 
 <template>
   <main class="mx-auto inline px-4 py-8">
-    <h1 class="mb-4 text-center text-3xl font-bold">Enviar Novos Vídeos</h1>
+    <h1 class="mb-4 text-center text-3xl font-bold">Enviar Novos Arquivos</h1>
 
     <form class="mx-auto max-w-2xl rounded-lg p-6 shadow" @submit.prevent="handleUpload">
       <!-- Drag and Drop -->
@@ -144,23 +144,22 @@ const handleUpload = async () => {
         @dragover="handleDragOver"
         @drop="handleDrop"
       >
-        <p>Arraste e solte os vídeos aqui ou</p>
+        <p>Arraste e solte os arquivos aqui ou</p>
         <label
           class="relative mx-auto flex cursor-pointer items-center gap-2 rounded border border-blue-400 px-4 py-2 font-semibold shadow"
         >
-          <span>Selecionar vídeos</span>
+          <span>Selecionar arquivos</span>
           <input
             type="file"
             multiple
             :disabled="uploading"
-            accept="video/mp4,video/x-msvideo,video/x-matroska,video/quicktime,video/x-ms-wmv,video/mp2t"
+            :accept="allowedMimeTypes.join(',')"
             @change="handleFileChange"
             class="absolute top-0 left-0 h-full w-full cursor-pointer opacity-0 disabled:cursor-not-allowed"
           />
         </label>
       </div>
 
-      <!-- Lista de vídeos -->
       <div v-if="files.length > 0" class="space-y-4">
         <div
           v-for="(file, index) in files"
@@ -168,9 +167,9 @@ const handleUpload = async () => {
           class="rounded border p-3 shadow-sm"
         >
           <!-- Nome editável + remover -->
-          <div class="flex items-center justify-between gap-2">
+          <div class="mb-2 flex items-center justify-between gap-2">
             <input
-              v-model="videoNames[index]"
+              v-model="fileNames[index]"
               maxlength="95"
               :readonly="uploading"
               class="w-full rounded border px-2 py-1 text-sm"
@@ -178,22 +177,15 @@ const handleUpload = async () => {
             <button
               type="button"
               class="rounded bg-red-500 px-2 py-1 text-xs text-white hover:bg-red-600 disabled:opacity-50"
-              @click="removeVideo(index)"
+              @click="removeFile(index)"
               :disabled="uploading"
             >
               Remover
             </button>
           </div>
 
-          <!-- Preview -->
-          <video
-            v-if="videoPreviews[index]"
-            :src="videoPreviews[index]"
-            controls
-            class="mt-2 max-h-48 rounded border"
-          />
+          <UploadingFilePreview :file="file" />
 
-          <!-- Barra de progresso -->
           <div v-if="uploading" class="mt-2">
             <div class="h-2 w-full overflow-hidden rounded bg-gray-200 dark:bg-gray-700">
               <div
@@ -213,7 +205,7 @@ const handleUpload = async () => {
         :disabled="uploading"
         class="mt-6 w-full rounded bg-blue-600 py-2 font-semibold text-white disabled:opacity-50"
       >
-        {{ uploading ? 'Enviando vídeos...' : 'Enviar Vídeos' }}
+        {{ uploading ? 'Enviando arquivos...' : 'Enviar Arquivos' }}
       </button>
     </form>
   </main>

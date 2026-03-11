@@ -4,12 +4,13 @@ import { useRoute, useRouter } from 'vue-router'
 import api from '@/services/api'
 import ConfirmationModal from '@/components/ConfirmationModal.vue'
 import type { ModalStatus } from '@/types/modal'
+import FileVisualizer from '@/components/FileVisualizer.vue'
 
 const route = useRoute()
 const router = useRouter()
 const loading = ref(true)
 const error = ref('')
-const videoData = ref<{
+const fileData = ref<{
   signedUrl: string
   watchUrl: string
   metadata: {
@@ -24,12 +25,12 @@ const copied = ref(false)
 const showDeleteModal = ref(false)
 const deleteStatus = ref<ModalStatus>(undefined)
 
-const fetchVideo = async () => {
+const fetchFile = async () => {
   loading.value = true
   error.value = ''
   try {
-    const { data } = await api.get(`/v1/videos/${route.params.id}`)
-    videoData.value = {
+    const { data } = await api.get(`/v1/files/${route.params.id}`)
+    fileData.value = {
       ...data,
       watchUrl: `${window.location.origin}/watch/${data.signedUrl?.split('/').at(-1)}`,
     }
@@ -42,14 +43,14 @@ const fetchVideo = async () => {
   }
 }
 
-const confirmDeleteVideo = async () => {
+const confirmDeleteFile = async () => {
   deleteStatus.value = 'loading'
   try {
-    await api.delete(`/v1/videos/${videoData?.value?.fileId}`)
+    await api.delete(`/v1/files/${fileData?.value?.fileId}`)
     deleteStatus.value = 'success'
 
     setTimeout(() => {
-      router.replace({ name: 'list-videos' })
+      router.replace({ name: 'list-files' })
       showDeleteModal.value = false
     }, 1000)
   } catch (e: any) {
@@ -86,7 +87,7 @@ function formatExpiration(dateStr: string) {
   })
 }
 
-onMounted(fetchVideo)
+onMounted(fetchFile)
 </script>
 
 <template>
@@ -99,7 +100,7 @@ onMounted(fetchVideo)
       <div v-if="loading" class="py-8">Carregando arquivo...</div>
       <div v-else-if="error" class="text-error py-8">{{ error }}</div>
       <div v-else>
-        <h2 class="mb-4 text-xl font-semibold">{{ videoData?.metadata?.fileName || 'Arquivo' }}</h2>
+        <h2 class="mb-4 text-xl font-semibold">{{ fileData?.metadata?.fileName || 'Arquivo' }}</h2>
 
         <div class="mb-4 flex flex-col items-center gap-6">
           <div class="flex w-full max-w-xl flex-col gap-2 rounded-lg border p-4 shadow">
@@ -109,7 +110,7 @@ onMounted(fetchVideo)
           </div>
         </div>
 
-        <div v-if="videoData?.signedUrl" class="mb-4 flex flex-col items-center gap-6">
+        <div v-if="fileData?.signedUrl" class="mb-4 flex flex-col items-center gap-6">
           <!-- Card: Link direto para download -->
           <div class="flex w-full max-w-xl flex-col gap-2 rounded-lg border p-4 shadow">
             <div class="mb-2 flex items-center gap-2">
@@ -132,20 +133,20 @@ onMounted(fetchVideo)
             <div class="flex items-center gap-2">
               <input
                 type="text"
-                :value="videoData.signedUrl"
+                :value="fileData.signedUrl"
                 readonly
                 class="flex-1 rounded border px-2 py-1 text-sm focus:outline-none"
                 @focus="(e: any) => e.target.select()"
               />
               <button
                 class="rounded px-3 py-1 text-sm transition"
-                @click="copyLink(videoData.signedUrl)"
+                @click="copyLink(fileData.signedUrl)"
               >
                 Copiar
               </button>
               <button
                 class="rounded px-3 py-1 text-sm transition"
-                @click="openLinkInNewTab(videoData.signedUrl)"
+                @click="openLinkInNewTab(fileData.signedUrl)"
               >
                 Ver em nova aba
               </button>
@@ -153,7 +154,7 @@ onMounted(fetchVideo)
           </div>
 
           <!-- Card: Link para assistir no navegador -->
-          <template v-if="videoData?.metadata?.fileType.startsWith('video') && videoData?.watchUrl">
+          <template v-if="fileData?.metadata?.fileType.startsWith('video') && fileData?.watchUrl">
             <div class="flex w-full max-w-xl flex-col gap-2 rounded-lg border p-4 shadow">
               <div class="mb-2 flex items-center gap-2">
                 <svg
@@ -177,20 +178,20 @@ onMounted(fetchVideo)
               <div class="flex items-center gap-2">
                 <input
                   type="text"
-                  :value="videoData.watchUrl"
+                  :value="fileData.watchUrl"
                   readonly
                   class="flex-1 rounded border px-2 py-1 text-sm focus:outline-none"
                   @focus="(e: any) => e.target.select()"
                 />
                 <button
                   class="rounded px-3 py-1 text-sm transition"
-                  @click="copyLink(videoData.watchUrl)"
+                  @click="copyLink(fileData.watchUrl)"
                 >
                   Copiar
                 </button>
                 <button
                   class="rounded px-3 py-1 text-sm transition"
-                  @click="openLinkInNewTab(videoData.watchUrl)"
+                  @click="openLinkInNewTab(fileData.watchUrl)"
                 >
                   Ver em nova aba
                 </button>
@@ -200,7 +201,7 @@ onMounted(fetchVideo)
 
           <span v-if="copied" class="mt-2 text-sm">Link copiado!</span>
           <div
-            v-if="videoData?.expirationDate"
+            v-if="fileData?.expirationDate"
             class="mt-2 flex items-center gap-2 rounded border px-3 py-2 text-sm"
           >
             <svg
@@ -218,14 +219,12 @@ onMounted(fetchVideo)
             </svg>
             <span>
               Os links estarão acessíveis até
-              <span class="font-semibold">{{ formatExpiration(videoData.expirationDate) }}</span>
+              <span class="font-semibold">{{ formatExpiration(fileData.expirationDate) }}</span>
             </span>
           </div>
         </div>
         <div class="mb-6 flex justify-center">
-          <template
-            v-if="videoData?.metadata?.fileType.startsWith('video') && videoData?.signedUrl"
-          >
+          <template v-if="fileData?.metadata?.fileType.startsWith('video') && fileData?.signedUrl">
             <div
               class="flex max-w-2xl items-center gap-3 rounded-lg border border-amber-300 px-6 py-4 shadow-sm"
             >
@@ -249,40 +248,7 @@ onMounted(fetchVideo)
             </div>
           </template>
         </div>
-        <div class="mb-6 flex justify-center">
-          <!-- TODO: Componentizar e criar uma factory -->
-          <template
-            v-if="videoData?.signedUrl && videoData?.metadata?.fileType.startsWith('video')"
-          >
-            <video
-              :src="videoData.signedUrl"
-              controls
-              class="mx-auto mb-4 max-w-full rounded shadow"
-            />
-          </template>
-          <template
-            v-else-if="videoData?.signedUrl && videoData?.metadata?.fileType.startsWith('image')"
-          >
-            <img
-              :src="videoData.signedUrl"
-              alt="Pré-visualização da imagem"
-              class="mx-auto mb-4 max-w-full rounded shadow"
-            />
-          </template>
-          <template
-            v-else-if="videoData?.signedUrl && videoData?.metadata?.fileType === 'application/pdf'"
-          >
-            <iframe
-              :src="videoData.signedUrl"
-              class="mx-auto mb-4 max-w-full rounded shadow"
-              style="width: 100%; height: 500px; border: none"
-              title="Pré-visualização do PDF"
-            />
-          </template>
-          <template v-else>
-            <span class="text-sm">Pré-visualização não disponível para este tipo de arquivo.</span>
-          </template>
-        </div>
+        <FileVisualizer :file-type="fileData?.metadata?.fileType" :file-url="fileData?.signedUrl" />
       </div>
     </section>
 
@@ -295,11 +261,11 @@ onMounted(fetchVideo)
       confirmText="Confirmar"
       loadingText="Deletando..."
       @cancel="showDeleteModal = false"
-      @confirm="confirmDeleteVideo"
+      @confirm="confirmDeleteFile"
     >
       <p>
         Deseja realmente <span class="font-semibold text-red-600">excluir</span> o arquivo
-        <strong>{{ videoData?.metadata?.fileName }}</strong
+        <strong>{{ fileData?.metadata?.fileName }}</strong
         >?
       </p>
     </ConfirmationModal>

@@ -32,7 +32,6 @@ const logout = () => {
 </script>
 
 <template>
-  <!-- TODO: Criar CSS var para a cor do -->
   <header class="bg-white shadow dark:bg-zinc-900">
     <div class="container mx-auto flex items-center justify-between px-4 py-6">
       <router-link to="/" class="cursor-pointer text-2xl font-bold" data-cy="home-link">
@@ -47,7 +46,7 @@ const logout = () => {
 
           <template v-if="isAdmin">
             <li>
-              <router-link to="/admin/videos" data-cy="admin-videos-link">
+              <router-link to="/admin/files" data-cy="admin-files-link">
                 Administrar Arquivos
               </router-link>
             </li>
@@ -63,10 +62,10 @@ const logout = () => {
               <StorageQuota />
             </li>
             <li>
-              <router-link to="/list-videos" data-cy="my-videos-link"> Meus Arquivos </router-link>
+              <router-link to="/list-files" data-cy="my-files-link"> Meus Arquivos </router-link>
             </li>
             <li>
-              <router-link to="/upload" data-cy="upload-video-link">Enviar Arquivo </router-link>
+              <router-link to="/upload" data-cy="upload-file-link">Enviar Arquivo </router-link>
             </li>
           </template>
 

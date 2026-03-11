@@ -3,24 +3,24 @@ import { ref, onMounted } from 'vue'
 import api from '@/services/api'
 import ConfirmationModal from '@/components/ConfirmationModal.vue'
 import type { ModalStatus } from '@/types/modal'
+import FileVisualizer from '@/components/FileVisualizer.vue'
 
-type Video = {
+type File = {
   id: number
   name: string
   uploaded: boolean
   createdAt: string
   shareUrl: string
   expiresIn: string
+  contentType: string
 }
 
 // TODO: Implementar pesquisa/filtros
-// TODO: Implementar relatorios de videos
+// TODO: Implementar relatorios de files
 // TODO: Verificação periódica de uso de armazenamento global no storage
 // TODO: Implementar limite/controle de armazenamento por usuario?
 
-// TODO: Implementar pré-visualização de arquivos com base no tipo (ex: imagens, vídeos, etc)
-
-const videos = ref<Video[]>([])
+const files = ref<File[]>([])
 const loading = ref(true)
 const error = ref('')
 
@@ -29,63 +29,66 @@ const totalPages = ref(1)
 const rowsPerPage = 10
 
 const showModal = ref(false)
-const selectedVideoUrl = ref('')
-const selectedVideoName = ref('')
+const selectedFileUrl = ref('')
+const selectedFileName = ref('')
+const selectedFileContentType = ref('')
 
 const showDeleteModal = ref(false)
-const videoToDelete = ref<Video | null>(null)
+const fileToDelete = ref<File | null>(null)
 const deleteStatus = ref<ModalStatus>(undefined)
 
-const fetchVideos = async () => {
+const fetchFiles = async () => {
   loading.value = true
   error.value = ''
   try {
-    const { data } = await api.get('/v1/admin/videos', {
+    const { data } = await api.get('/v1/admin/files', {
       params: {
         sort: 'asc',
         rows: rowsPerPage,
         page: currentPage.value,
       },
     })
-    videos.value = data.content
+    files.value = data.content
     totalPages.value = data.totalPages || 1
   } catch (e: any) {
-    error.value = e?.response?.data?.message || 'Erro ao carregar vídeos.'
+    error.value = e?.response?.data?.message || 'Erro ao carregar arquivos.'
   } finally {
     loading.value = false
   }
 }
 
-const viewVideo = async (video: Video) => {
-  selectedVideoName.value = video.name
+const viewFile = async (file: File) => {
+  selectedFileName.value = file.name
+  selectedFileContentType.value = file.contentType
+
   try {
-    const expiresAt = new Date(video.expiresIn)
+    const expiresAt = new Date(file.expiresIn)
     if (expiresAt > new Date()) {
-      selectedVideoUrl.value = video.shareUrl
+      selectedFileUrl.value = file.shareUrl
     } else {
-      const { data } = await api.get(`/v1/admin/videos/${video.id}`)
-      selectedVideoUrl.value = data.signedUrl
+      const { data } = await api.get(`/v1/admin/files/${file.id}`)
+      selectedFileUrl.value = data.signedUrl
     }
     showModal.value = true
   } catch (e: any) {
-    console.error('Erro ao buscar URL do vídeo:', e)
-    alert('Não foi possível carregar o vídeo.')
+    console.error('Erro ao buscar URL do arquivo:', e)
+    alert('Não foi possível carregar o arquivo.')
   }
 }
 
-const openDeleteModal = (video: Video) => {
-  videoToDelete.value = video
+const openDeleteModal = (file: File) => {
+  fileToDelete.value = file
   deleteStatus.value = undefined
   showDeleteModal.value = true
 }
 
-const confirmDeleteVideo = async () => {
-  if (!videoToDelete.value) return
+const confirmDeleteFile = async () => {
+  if (!fileToDelete.value) return
   deleteStatus.value = 'loading'
   try {
-    await api.delete(`/v1/admin/videos/${videoToDelete.value.id}`)
+    await api.delete(`/v1/admin/files/${fileToDelete.value.id}`)
     deleteStatus.value = 'success'
-    await fetchVideos()
+    await fetchFiles()
     setTimeout(() => {
       showDeleteModal.value = false
     }, 1000)
@@ -97,28 +100,28 @@ const confirmDeleteVideo = async () => {
 const changePage = (direction: 'next' | 'prev') => {
   if (direction === 'next' && currentPage.value < totalPages.value - 1) {
     currentPage.value++
-    fetchVideos()
+    fetchFiles()
   } else if (direction === 'prev' && currentPage.value > 0) {
     currentPage.value--
-    fetchVideos()
+    fetchFiles()
   }
 }
 
-onMounted(fetchVideos)
+onMounted(fetchFiles)
 </script>
 
 <template>
   <main class="container mx-auto flex-col px-4 py-8">
     <section class="mb-8 text-center">
-      <h1 class="mb-4 text-3xl font-bold">Gerenciar Vídeos</h1>
-      <p class="mb-6 text-lg">Liste e gerencie todos os vídeos da plataforma.</p>
+      <h1 class="mb-4 text-3xl font-bold">Gerenciar Arquivos</h1>
+      <p class="mb-6 text-lg">Liste e gerencie todos os arquivos da plataforma.</p>
     </section>
 
     <section class="rounded-lg p-6 shadow-xl">
       <div v-if="loading" class="py-8 text-center">Carregando...</div>
       <div v-else-if="error" class="text-error py-8 text-center">{{ error }}</div>
       <div v-else>
-        <div v-if="videos.length === 0" class="text-center">Nenhum vídeo encontrado.</div>
+        <div v-if="files.length === 0" class="text-center">Nenhum arquivo encontrado.</div>
 
         <div v-else>
           <div class="grid grid-cols-4 gap-4 border-b py-2 font-semibold text-gray-700">
@@ -130,30 +133,29 @@ onMounted(fetchVideos)
 
           <ul class="divide-y">
             <li
-              v-for="video in videos"
-              :key="video.id"
+              v-for="file in files"
+              :key="file.id"
               class="grid grid-cols-4 items-center gap-4 py-4"
             >
-              <div class="font-semibold">#{{ video.id }}</div>
+              <div class="font-semibold">#{{ file.id }}</div>
               <div class="group relative max-w-full">
-                <div class="truncate text-lg font-bold" :title="video.name">
-                  {{ video.name }}
+                <div class="truncate text-lg font-bold" :title="file.name">
+                  {{ file.name }}
                 </div>
-                <!-- TODO: Usar css vars para background -->
                 <div
                   class="absolute top-full left-0 z-10 mt-1 hidden w-max max-w-screen-md rounded bg-gray-800 px-2 py-1 text-sm text-white shadow group-hover:block dark:bg-gray-500"
                 >
-                  {{ video.name }}
+                  {{ file.name }}
                 </div>
               </div>
               <div>
-                <span :class="video.uploaded ? 'text-green-600' : 'text-red-600'">
-                  {{ video.uploaded ? 'Upload completo' : 'Pendente' }}
+                <span :class="file.uploaded ? 'text-green-600' : 'text-red-600'">
+                  {{ file.uploaded ? 'Upload completo' : 'Pendente' }}
                 </span>
               </div>
               <div class="flex justify-end gap-2">
-                <button class="rounded px-3 py-1" @click="viewVideo(video)">Visualizar</button>
-                <button class="bg-danger rounded px-3 py-1" @click="openDeleteModal(video)">
+                <button class="rounded px-3 py-1" @click="viewFile(file)">Visualizar</button>
+                <button class="bg-danger rounded px-3 py-1" @click="openDeleteModal(file)">
                   Deletar
                 </button>
               </div>
@@ -182,19 +184,13 @@ onMounted(fetchVideos)
       </div>
     </section>
 
-    <!-- Modal de vídeo -->
     <div
       v-if="showModal"
       class="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black"
     >
       <div class="relative w-full max-w-3xl rounded-lg bg-black p-6 shadow-lg">
-        <h2 class="mb-4 text-xl font-bold">{{ selectedVideoName }}</h2>
-        <video
-          v-if="selectedVideoUrl"
-          class="max-h-[70vh] w-full rounded"
-          controls
-          :src="selectedVideoUrl"
-        />
+        <h2 class="mb-4 text-xl font-bold">{{ selectedFileName }}</h2>
+        <FileVisualizer :file-type="selectedFileContentType" :file-url="selectedFileUrl" />
         <button
           class="bg-secondary absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full text-white focus:outline-none"
           @click="showModal = false"
@@ -214,11 +210,11 @@ onMounted(fetchVideos)
       confirmText="Confirmar"
       loadingText="Deletando..."
       @cancel="showDeleteModal = false"
-      @confirm="confirmDeleteVideo"
+      @confirm="confirmDeleteFile"
     >
       <p>
-        Deseja realmente <span class="font-semibold text-red-600">excluir</span> o vídeo
-        <strong>{{ videoToDelete?.name }}</strong
+        Deseja realmente <span class="font-semibold text-red-600">excluir</span> o arquivo
+        <strong>{{ fileToDelete?.name }}</strong
         >?
       </p>
     </ConfirmationModal>

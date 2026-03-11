@@ -43,19 +43,19 @@ public class AdminController {
         return ResponseEntity.noContent().build();
     }
 	
-	@GetMapping("/videos")
+	@GetMapping("/files")
     public ResponseEntity<Page<FileDTO>> listFiles(@Valid @ModelAttribute ListFilesRequestParams params) {
 
         return ResponseEntity.ok(adminService.listFiles(params));
     }
 	
-	@GetMapping("/videos/{fileId}")
+	@GetMapping("/files/{fileId}")
     public ResponseEntity<AdminFileSignedUrl> getFile(@PathVariable Long fileId) {
 
         return ResponseEntity.ok(adminService.getFile(fileId));
     }
 	
-	@DeleteMapping("/videos/{fileId}")
+	@DeleteMapping("/files/{fileId}")
 	public ResponseEntity<Void> deleteFile(@PathVariable Long fileId) {
 		adminService.deleteFile(fileId);
 		

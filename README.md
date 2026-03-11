@@ -6,7 +6,7 @@
 - Professor(a): Alysson Borges
 - Disciplina: 30062 - PROJETO INTEGRADOR - EAD54-12
 
-Este repositório contém o desenvolvimento completo de uma **plataforma de compartilhamento temporário de arquivos** (em sua versão inicial apenas videos), criada como Projeto Integrador do curso de Análise e Desenvolvimento de Sistemas.
+Este repositório contém o desenvolvimento completo de uma **plataforma de compartilhamento temporário de arquivos**, criada como Projeto Integrador do curso de Análise e Desenvolvimento de Sistemas.
 
 O projeto abrange todas as etapas do desenvolvimento de um sistema, incluindo levantamento de requisitos, modelagem do negócio, documentação técnica e implementação da aplicação.
 

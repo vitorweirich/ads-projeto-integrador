@@ -1,4 +1,4 @@
-@startuml
+@startuml "Sequência - Visualização de Vídeo Compartilhado"
 title Sequência - Visualização de Vídeo Compartilhado
 
 actor "Espectador" as V

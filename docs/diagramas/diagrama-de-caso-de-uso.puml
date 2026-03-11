@@ -1,4 +1,4 @@
-@startuml
+@startuml "Diagrama de Caso de Uso"
 left to right direction
 skinparam packageStyle rectangle
 
@@ -28,24 +28,24 @@ rectangle "File Share" {
   usecase "Gerar QR Code MFA" as UC_MfaQr
   usecase "Confirmar setup MFA" as UC_MfaConfirm
 
-  usecase "Listar meus vídeos" as UC_ListMyVideos
-  usecase "Upload de vídeo (simples)" as UC_UploadSingle
-  usecase "Upload de vídeos (múltiplo)" as UC_UploadMultiple
+  usecase "Listar meus arquivos" as UC_ListMyFiles
+  usecase "Upload de arquivo (simples)" as UC_UploadSingle
+  usecase "Upload de arquivos (múltiplo)" as UC_UploadMultiple
   usecase "Solicitar URL assinada para upload" as UC_RequestUploadUrl
   usecase "Registrar upload concluído" as UC_RegisterUploaded
 
-  usecase "Visualizar detalhes do vídeo" as UC_ViewVideo
+  usecase "Visualizar detalhes do arquivo" as UC_ViewFile
   usecase "Gerar link de compartilhamento" as UC_GenerateShareLink
-  usecase "Excluir vídeo próprio" as UC_DeleteOwnVideo
+  usecase "Excluir arquivo próprio" as UC_DeleteOwnFile
 
-  usecase "Assistir vídeo por link compartilhado" as UC_WatchShared
+  usecase "Assistir arquivo por link compartilhado" as UC_WatchShared
   usecase "Resolver short link / redirecionar" as UC_ResolveShortLink
 
   usecase "Listar usuários (admin)" as UC_AdminListUsers
   usecase "Resetar MFA de usuário (admin)" as UC_AdminResetMfa
-  usecase "Listar vídeos da plataforma (admin)" as UC_AdminListVideos
-  usecase "Visualizar vídeo (admin)" as UC_AdminViewVideo
-  usecase "Excluir vídeo (admin)" as UC_AdminDeleteVideo
+  usecase "Listar arquivos da plataforma (admin)" as UC_AdminListFiles
+  usecase "Visualizar arquivo (admin)" as UC_AdminViewFile
+  usecase "Excluir arquivo (admin)" as UC_AdminDeleteFile
 }
 
 Guest --> UC_Register
@@ -59,20 +59,20 @@ User --> UC_Profile
 User --> UC_Logout
 User --> UC_DeleteAccount
 User --> UC_EnableMfa
-User --> UC_ListMyVideos
+User --> UC_ListMyFiles
 User --> UC_UploadSingle
 User --> UC_UploadMultiple
-User --> UC_ViewVideo
+User --> UC_ViewFile
 User --> UC_GenerateShareLink
-User --> UC_DeleteOwnVideo
+User --> UC_DeleteOwnFile
 
 Viewer --> UC_WatchShared
 
 Admin --> UC_AdminListUsers
 Admin --> UC_AdminResetMfa
-Admin --> UC_AdminListVideos
-Admin --> UC_AdminViewVideo
-Admin --> UC_AdminDeleteVideo
+Admin --> UC_AdminListFiles
+Admin --> UC_AdminViewFile
+Admin --> UC_AdminDeleteFile
 
 UC_Login .> UC_VerifyMfaLogin : <<extend>>
 UC_Register .> UC_ConfirmEmail : <<include>>

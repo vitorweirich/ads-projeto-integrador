@@ -33,8 +33,6 @@ const handleLogin = async () => {
       // Mantém os query parameters existentes
       router.push({ path: '/verify-mfa', query: router.currentRoute.value.query })
     } else {
-      // Autenticação normal com cookies
-      await auth.fetchUser()
       handlePostLoginRedirect()
     }
 

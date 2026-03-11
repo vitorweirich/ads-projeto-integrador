@@ -5,6 +5,7 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useToastStore } from '@/stores/toast'
 import { allowedMimeTypes } from '@/constants/fileTypes'
+import UploadingFilePreview from '@/components/UploadingFilePreview.vue'
 
 const file = ref<File | null>(null)
 const filePreview = ref<string | null>(null)
@@ -48,7 +49,10 @@ const processFile = async (selected: File) => {
   }
 
   if (!title.value) {
-    title.value = selected.name.replace(/\.[^/.]+$/, '').slice(0, 70)
+    title.value = selected.name
+      .replace(/\.[^/.]+$/g, '')
+      .replace(/\./g, '_')
+      .slice(0, 70)
   }
 
   file.value = selected
@@ -89,7 +93,7 @@ const handleUpload = async () => {
   uploadingProgress.value = 0
   uploadError.value = ''
   try {
-    const { data: signedUrlData } = await api.post('/v1/videos/upload', {
+    const { data: signedUrlData } = await api.post('/v1/files/upload', {
       fileName: title.value.slice(0, 70),
       contentType: file.value.type,
       fileSize: file.value.size,
@@ -117,13 +121,13 @@ const handleUpload = async () => {
       xhr.onerror = () => reject(new Error('Erro ao enviar arquivo.'))
       xhr.send(file.value)
     })
-    await api.patch(`/v1/videos/upload/${signedUrlData.fileId}/register-uploaded`)
+    await api.patch(`/v1/files/upload/${signedUrlData.fileId}/register-uploaded`)
     if (filePreview.value) {
       URL.revokeObjectURL(filePreview.value)
       filePreview.value = null
     }
 
-    router.push({ name: 'list-videos' })
+    router.push({ name: 'list-files' })
   } catch (e: any) {
     uploadError.value = e?.response?.data?.message || e?.message || 'Erro ao enviar arquivo.'
   } finally {
@@ -181,29 +185,7 @@ const handleUpload = async () => {
           }}</span>
         </div>
 
-        <div v-if="filePreview && file" class="mt-4 flex justify-center">
-          <template v-if="file.type.startsWith('video')">
-            <video :src="filePreview" controls class="max-h-64 rounded border shadow" />
-          </template>
-          <template v-else-if="file.type === 'image/jpg' || file.type === 'image/jpeg'">
-            <img
-              :src="filePreview"
-              alt="Pré-visualização da imagem"
-              class="max-h-64 rounded border shadow"
-            />
-          </template>
-          <template v-else-if="file.type === 'application/pdf'">
-            <iframe
-              :src="filePreview"
-              class="mx-auto mb-4 max-w-full rounded shadow"
-              style="width: 100%; height: 500px; border: none"
-              title="Pré-visualização do PDF"
-            />
-          </template>
-          <template v-else>
-            <span class="text-sm">Pré-visualização não disponível para este tipo de arquivo.</span>
-          </template>
-        </div>
+        <UploadingFilePreview :file="file" />
       </div>
 
       <div v-if="uploading" class="mb-4">
@@ -226,5 +208,14 @@ const handleUpload = async () => {
         {{ uploading ? 'Enviando...' : 'Enviar Arquivo' }}
       </button>
     </form>
+
+    <div class="flex gap-2 text-center text-sm">
+      Precisa enviar multiplos arquivos?<router-link
+        to="/upload-multiple"
+        class=""
+        data-cy="link-forgot-password"
+        >Enviar múltiplos arquivos</router-link
+      >
+    </div>
   </main>
 </template>

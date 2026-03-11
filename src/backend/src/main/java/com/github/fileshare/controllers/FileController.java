@@ -22,7 +22,7 @@ import com.github.fileshare.services.FileStorageService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-@RequestMapping("/v1/videos")
+@RequestMapping("/v1/files")
 @RestController
 @RequiredArgsConstructor
 public class FileController {

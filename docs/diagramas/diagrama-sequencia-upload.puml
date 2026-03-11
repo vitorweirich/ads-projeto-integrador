@@ -1,5 +1,5 @@
-@startuml
-title Sequência - Upload de Vídeo (fluxo principal)
+@startuml "Sequência - Upload de Arquivo (fluxo principal)"
+title Sequência - Upload de Arquivo (fluxo principal)
 
 actor "Usuário" as U
 participant "Frontend" as FE
@@ -8,17 +8,17 @@ database "Banco de Dados" as DB
 collections "Storage (S3/R2)" as ST
 
 U -> FE: Seleciona arquivo + título
-FE -> API: POST /v1/videos/upload (metadata)
-API -> DB: Cria registro de vídeo (pendente)
-DB --> API: videoId
+FE -> API: POST /v1/files/upload (metadata)
+API -> DB: Cria registro de arquivo (pendente)
+DB --> API: fileId
 API -> ST: Gera signedUrl (PUT)
 ST --> API: signedUrl
-API --> FE: { videoId, signedUrl }
+API --> FE: { fileId, signedUrl }
 
 FE -> ST: PUT arquivo (signedUrl)
 ST --> FE: 200 OK
 
-FE -> API: PATCH /v1/videos/upload/{videoId}/register-uploaded
+FE -> API: PATCH /v1/files/upload/{fileId}/register-uploaded
 API -> DB: Atualiza status para uploaded=true
 DB --> API: OK
 API --> FE: 204 No Content (X-Client-Action: refresh-user)

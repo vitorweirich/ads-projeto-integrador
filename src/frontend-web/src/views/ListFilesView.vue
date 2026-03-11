@@ -5,7 +5,7 @@ import { formatBytes } from '@/utils/filesUtils'
 import Pagination from '@/components/Pagination.vue'
 import { useToastStore } from '@/stores/toast'
 
-type Video = {
+type File = {
   id: number
   name: string
   uploaded: boolean
@@ -14,9 +14,10 @@ type Video = {
   shareUrl: string
   expiresIn: string
   size: number
+  contentType: string
 }
 
-const videos = ref<Video[]>([])
+const files = ref<File[]>([])
 const loading = ref(true)
 const linkLoading = ref(false)
 const error = ref('')
@@ -34,52 +35,56 @@ const copyLink = async (signedUrl: string) => {
   }
 }
 
-const fetchVideos = async () => {
+const fetchFiles = async () => {
   loading.value = true
   error.value = ''
   try {
-    const { data } = await api.get('/v1/videos/me', {
+    const { data } = await api.get('/v1/files/me', {
       params: {
         page: currentPage.value,
         rows: rowsPerPage,
       },
     })
-    videos.value = data.content.map((video: Video) => ({
-      ...video,
-      watchUrl: video.shareUrl
-        ? `${window.location.origin}/watch/${video.shareUrl?.split('/')?.pop()}`
-        : undefined,
+    files.value = data.content.map((file: File) => ({
+      ...file,
+      watchUrl:
+        file.shareUrl && file.contentType.startsWith('video/')
+          ? `${window.location.origin}/watch/${file.shareUrl?.split('/')?.pop()}`
+          : undefined,
     }))
     totalPages.value = data.totalPages || 1
   } catch (e: any) {
-    error.value = e?.response?.data?.message || 'Erro ao carregar vídeos.'
+    error.value = e?.response?.data?.message || 'Erro ao carregar arquivos.'
   } finally {
     loading.value = false
   }
 }
 
-const fetchVideo = async (id: number) => {
+const fetchFile = async (id: number) => {
   linkLoading.value = true
   error.value = ''
   try {
-    const { data } = await api.get(`/v1/videos/${id}`)
-    const video = {
+    const { data } = await api.get(`/v1/files/${id}`)
+    const file = {
       ...data,
-      watchUrl: `${window.location.origin}/watch/${data.signedUrl?.split('/').at(-1)}`,
+      shareUrl: data.signedUrl,
+      watchUrl: data.metadata?.contentType?.startsWith('video/')
+        ? `${window.location.origin}/watch/${data.signedUrl?.split('/').at(-1)}`
+        : undefined,
     }
-    const index = videos.value.findIndex((v) => v.id === id)
+    const index = files.value.findIndex((v) => v.id === id)
     if (index !== -1) {
-      videos.value[index] = { ...videos.value[index], watchUrl: video.watchUrl }
-      copyLink(video.watchUrl)
+      files.value[index] = { ...files.value[index], ...file }
+      copyLink(file.watchUrl || file.shareUrl)
     }
   } catch (e: any) {
-    error.value = e?.response?.data?.message || 'Erro ao gerar link para o video.'
+    error.value = e?.response?.data?.message || 'Erro ao gerar link para o file.'
   } finally {
     linkLoading.value = false
   }
 }
 
-onMounted(fetchVideos)
+onMounted(fetchFiles)
 </script>
 
 <template>
@@ -95,42 +100,38 @@ onMounted(fetchVideos)
       <div v-if="loading" class="py-8 text-center">Carregando...</div>
       <div v-else-if="error" class="text-error py-8 text-center">{{ error }}</div>
       <div v-else>
-        <div v-if="videos.length === 0" class="text-center">Nenhum arquivo encontrado.</div>
+        <div v-if="files.length === 0" class="text-center">Nenhum arquivo encontrado.</div>
         <ul v-else class="divide-y">
-          <li
-            v-for="video in videos"
-            :key="video.id"
-            class="grid grid-cols-7 items-center gap-2 py-4"
-          >
+          <li v-for="file in files" :key="file.id" class="grid grid-cols-7 items-center gap-2 py-4">
             <div class="col-span-4">
               <div class="group relative max-w-full">
-                <div class="truncate text-lg font-bold" :title="video.name">
-                  {{ video.name }}
+                <div class="truncate text-lg font-bold" :title="file.name">
+                  {{ file.name }}
                 </div>
                 <div
                   class="absolute top-full left-0 z-10 mt-1 hidden w-max max-w-screen-md rounded bg-gray-800 px-2 py-1 text-sm text-white shadow group-hover:block dark:bg-gray-500"
                 >
-                  {{ video.name }}
+                  {{ file.name }}
                 </div>
               </div>
             </div>
             <div class="col-span-1">
               <span class="text-sm">
-                {{ video.uploaded ? 'Upload realizado' : 'Upload pendente' }}
+                {{ file.uploaded ? 'Upload realizado' : 'Upload pendente' }}
               </span>
             </div>
             <div class="col-span-1">
               <span class="text-sm">
-                {{ formatBytes(video.size) }}
+                {{ formatBytes(file.size) }}
               </span>
             </div>
             <div class="col-span-1 flex flex-col justify-end gap-2">
               <div
-                v-if="video.watchUrl"
+                v-if="file.watchUrl || file.shareUrl"
                 class="flex flex-1 cursor-pointer items-center gap-2 rounded border bg-gray-50 px-2 py-1 text-sm hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
-                @click="copyLink(video.watchUrl)"
+                @click="copyLink(file.watchUrl || file.shareUrl)"
               >
-                <span class="flex-1 truncate">{{ video.watchUrl }}</span>
+                <span class="flex-1 truncate">{{ file.watchUrl || file.shareUrl }}</span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   class="h-4 w-4"
@@ -146,7 +147,7 @@ onMounted(fetchVideos)
               <button
                 v-else
                 class="btn-secondary"
-                @click="fetchVideo(video.id)"
+                @click="fetchFile(file.id)"
                 :disabled="linkLoading"
               >
                 <template v-if="linkLoading">
@@ -175,9 +176,9 @@ onMounted(fetchVideos)
                 <template v-else> Gerar Link </template>
               </button>
               <router-link
-                :to="{ name: 'view-video', params: { id: video.id } }"
+                :to="{ name: 'view-file', params: { id: file.id } }"
                 class="btn rounded px-3 py-1 text-center"
-                :class="{ 'pointer-events-none cursor-not-allowed opacity-50': !video.uploaded }"
+                :class="{ 'pointer-events-none cursor-not-allowed opacity-50': !file.uploaded }"
               >
                 Ver
               </router-link>
@@ -192,7 +193,7 @@ onMounted(fetchVideos)
           @page-change="
             (page: number) => {
               currentPage = page
-              fetchVideos()
+              fetchFiles()
             }
           "
         />

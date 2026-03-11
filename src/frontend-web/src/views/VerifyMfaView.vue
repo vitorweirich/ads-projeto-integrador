@@ -22,7 +22,6 @@ const verifyMfa = async () => {
       },
     )
 
-    await auth.fetchUser()
     auth.setMfaToken(null)
     const redirect = router.currentRoute.value.query.redirect as string
     router.push(redirect || '/')

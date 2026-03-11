@@ -40,7 +40,6 @@ api.interceptors.response.use(
 
       for (const action of actions) {
         switch (action) {
-          // TODO: Corrigir refresh duplicado nos fluxos de login (e mfa)
           case 'refresh-user':
             await useAuthStore().fetchUser(true)
             break

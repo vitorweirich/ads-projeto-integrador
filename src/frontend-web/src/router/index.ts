@@ -38,15 +38,15 @@ const router = createRouter({
       component: () => import('../views/ResetPasswordView.vue'),
     },
     {
-      path: '/list-videos',
-      name: 'list-videos',
-      component: () => import('../views/ListVideosView.vue'),
+      path: '/list-files',
+      name: 'list-files',
+      component: () => import('../views/ListFilesView.vue'),
       meta: { requiresAuth: true },
     },
     {
-      path: '/view-video/:id',
-      name: 'view-video',
-      component: () => import('../views/ViewVideoView.vue'),
+      path: '/view-file/:id',
+      name: 'view-file',
+      component: () => import('../views/ViewFileView.vue'),
       meta: { requiresAuth: true },
       props: true,
     },
@@ -85,9 +85,9 @@ const router = createRouter({
       props: true,
     },
     {
-      path: '/admin/videos',
-      name: 'admin-videos',
-      component: () => import('../views/AdminVideosView.vue'),
+      path: '/admin/files',
+      name: 'admin-files',
+      component: () => import('../views/AdminFilesView.vue'),
       meta: { requiresAuth: true, requiresAdmin: true },
       props: true,
     },
@@ -119,7 +119,7 @@ router.beforeEach(async (to, from, next) => {
   }
 
   if (requiresAdmin && !authStore.isAdmin) {
-    // TODO: Talvez adicionar uma mensagem?
+    // TODO: Talvez adicionar uma mensagem (toast)?
     return next({ name: 'home' })
   }
 
