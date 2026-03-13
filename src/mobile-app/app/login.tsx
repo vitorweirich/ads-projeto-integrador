@@ -21,8 +21,16 @@ export default function LoginScreen() {
     if (!email) return Alert.alert("Informe seu e-mail");
     setLoading(true);
     try {
-      await login(email, password);
-      router.replace("/(tabs)/videos");
+      const result = await login(email, password);
+      if (result?.requiresMfa) {
+        // Navegar para tela de verificação MFA
+        router.push({
+          pathname: "/mfa-verify",
+          params: { token: result.mfaToken },
+        });
+      } else {
+        router.replace("/(tabs)/videos");
+      }
     } catch (e: any) {
       Alert.alert("Erro ao entrar", e?.message || "Tente novamente.");
     } finally {

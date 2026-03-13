@@ -8,16 +8,18 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { Alert } from "react-native";
 
 type User = {
   name: string;
   email: string;
 };
 
+type LoginResult = { requiresMfa: boolean; mfaToken?: string };
+
 type AuthContextType = {
   user: User | null;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<LoginResult | void>;
+  verifyMfa: (mfaToken: string, code: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   authFetch: (path: string, init?: RequestInit) => Promise<Response>;
@@ -146,12 +148,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // MFA flow: backend may respond 200 with { token }
       if (res.ok) {
         const data = await res.json().catch(() => null);
-        if (data && "token" in data) {
-          Alert.alert(
-            "Verificação MFA necessária",
-            "Finalize o login no aplicativo/web que suporte MFA.",
-          );
-          return;
+        if (data && "token" in data && !data.accessToken) {
+          return { requiresMfa: true, mfaToken: data.token };
         }
         if (data && data.accessToken && data.refreshToken) {
           await saveTokens({
@@ -169,7 +167,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setUser(u);
             await persist(u);
           }
-          return;
+          return { requiresMfa: false };
         }
       }
 
@@ -183,7 +181,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       throw new Error(message);
     },
-    [persist, saveTokens],
+    [persist, saveTokens, fetchUserProfile],
   );
 
   const register = useCallback(
@@ -208,6 +206,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     },
     [],
+  );
+
+  const verifyMfa = useCallback(
+    async (mfaToken: string, code: string) => {
+      const res = await fetch(
+        `${API_URL}/v1/api/auth/mfa/verify?code=${code}`,
+        {
+          method: "POST",
+          headers: {
+            ...jsonHeaders,
+            Authorization: `Bearer ${mfaToken}`,
+          },
+        },
+      );
+
+      if (!res.ok) {
+        const error = await res.json().catch(() => null);
+        throw new Error(error?.message || "Código inválido");
+      }
+
+      const data = await res.json();
+
+      if (data.accessToken && data.refreshToken) {
+        await saveTokens({
+          accessToken: data.accessToken,
+          refreshToken: data.refreshToken,
+        });
+
+        // Fetch real profile data
+        const profile = await fetchUserProfile();
+        if (profile) {
+          setUser(profile);
+          await persist(profile);
+        }
+      } else {
+        throw new Error("Resposta inválida do servidor");
+      }
+    },
+    [saveTokens, fetchUserProfile, persist],
   );
 
   const logout = useCallback(async () => {
@@ -250,8 +287,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [fetchUserProfile, getTokens, persist, saveTokens]);
 
   const value = useMemo(
-    () => ({ user, login, register, logout, authFetch }),
-    [user, login, register, logout, authFetch],
+    () => ({ user, login, verifyMfa, register, logout, authFetch }),
+    [user, login, verifyMfa, register, logout, authFetch],
   );
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
