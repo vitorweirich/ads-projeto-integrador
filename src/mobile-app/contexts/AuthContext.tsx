@@ -12,6 +12,12 @@ import React, {
 type User = {
   name: string;
   email: string;
+  mfaEnabled?: boolean;
+  hasAdminPrivileges?: boolean;
+  storage?: {
+    usedQuota: number;
+    totalQuota: number;
+  };
 };
 
 type LoginResult = { requiresMfa: boolean; mfaToken?: string };
@@ -118,6 +124,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         data.email?.split?.("@")?.[0] ||
         "Usuário",
       email: data.email || "",
+      mfaEnabled: data.mfaEnabled || false,
+      hasAdminPrivileges: data.hasAdminPrivileges || false,
+      storage: data.storage || undefined,
     };
     return u;
   }, [authorizedFetch, refreshTokens]);
@@ -260,7 +269,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             ? { "X-Refresh-Token": tokens.refreshToken }
             : {}),
         },
-      }).catch(() => undefined);
+      });
     } finally {
       setUser(null);
       await persist(null);

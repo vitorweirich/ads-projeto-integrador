@@ -18,6 +18,15 @@ export default function MfaVerifyScreen() {
 
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
+  const inputRef = React.useRef<any>(null);
+
+  React.useEffect(() => {
+    // Auto focus no input quando a tela carregar
+    const timer = setTimeout(() => {
+      inputRef.current?.focus();
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   const onSubmit = async () => {
     if (!code || code.length !== 6) {
@@ -47,6 +56,7 @@ export default function MfaVerifyScreen() {
         Digite o código de 6 dígitos do seu aplicativo autenticador
       </Text>
       <TextInput
+        ref={inputRef}
         placeholder="000000"
         keyboardType="number-pad"
         maxLength={6}

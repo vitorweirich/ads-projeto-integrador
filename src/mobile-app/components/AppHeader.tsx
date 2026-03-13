@@ -1,20 +1,31 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { useRouter } from "expo-router";
+import { useRouter, usePathname } from "expo-router";
 import React from "react";
 import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
 
 export default function AppHeader() {
   const router = useRouter();
+  const pathname = usePathname();
   const { user, logout } = useAuth();
+
+  const handleProfilePress = () => {
+    if (pathname !== "/profile") {
+      router.push("/profile");
+    }
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>File Share</Text>
       {user ? (
         <View style={styles.right}>
-          <View style={styles.userPill} accessibilityRole="text">
+          <Pressable
+            onPress={handleProfilePress}
+            style={styles.userPill}
+            accessibilityRole="button"
+          >
             <Text style={styles.buttonText}>{user.name}</Text>
-          </View>
+          </Pressable>
           <Pressable
             onPress={() => {
               Alert.alert("Sair", "Deseja realmente sair?", [
@@ -47,7 +58,6 @@ export default function AppHeader() {
 
 const styles = StyleSheet.create({
   container: {
-    height: 56,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -55,6 +65,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: "#1E1A21",
     backgroundColor: "#1E1A21",
+    paddingBottom: 4,
   },
   right: {
     flexDirection: "row",

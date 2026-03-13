@@ -1,5 +1,5 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { Link, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   Alert,
@@ -64,9 +64,9 @@ export default function LoginScreen() {
           {loading ? "Entrando..." : "Entrar"}
         </Text>
       </Pressable>
-      <Link href={{ pathname: "/cadastro" } as any} style={styles.link}>
-        Não tem conta? Cadastre-se
-      </Link>
+      <Pressable onPress={() => router.replace("/cadastro")}>
+        <Text style={styles.link}>Não tem conta? Cadastre-se</Text>
+      </Pressable>
     </View>
   );
 }
@@ -88,5 +88,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   buttonText: { color: "#ffffff", fontWeight: "600" },
-  link: { color: "#BFBFBF", marginTop: 8 },
+  link: { color: "#2ECC71", marginTop: 8, textDecorationLine: "underline" },
 });

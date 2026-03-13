@@ -7,6 +7,7 @@ import "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import AppHeader from "@/components/AppHeader";
+import StackHeader from "@/components/StackHeader";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { VideosProvider } from "@/store/videos";
 
@@ -29,19 +30,31 @@ export default function RootLayout() {
     <ThemeProvider value={DefaultTheme}>
       <AuthProvider>
         <VideosProvider>
-          <SafeAreaView edges={["top"]}>
+          <StatusBar style="light" />
+
+          <SafeAreaView style={{ flex: 1, backgroundColor: "#1E1A21" }}>
             <AppHeader />
-          </SafeAreaView>
-          <View style={{ flex: 1, backgroundColor: "#1B0B26" }}>
-            <Stack initialRouteName="(tabs)">
+
+            <Stack
+              initialRouteName="(tabs)"
+              screenOptions={{
+                header: (props) => (
+                  <StackHeader title={props.options.title || ""} canGoBack />
+                ),
+              }}
+            >
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
               <Stack.Screen name="video/[id]" options={{ title: "Vídeo" }} />
               <Stack.Screen name="login" options={{ title: "Login" }} />
               <Stack.Screen name="+not-found" />
               <Stack.Screen name="cadastro" options={{ title: "Cadastro" }} />
+              <Stack.Screen name="profile" options={{ title: "Perfil" }} />
+              <Stack.Screen
+                name="mfa-verify"
+                options={{ title: "Verificação MFA", headerShown: false }}
+              />
             </Stack>
-          </View>
-          <StatusBar style="auto" />
+          </SafeAreaView>
         </VideosProvider>
       </AuthProvider>
     </ThemeProvider>
