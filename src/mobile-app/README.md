@@ -6,8 +6,6 @@ Link para esse arquivo no [github](https://github.com/vitorweirich/file-share-mo
 
 Link para apresentação do projeto no [youtube](https://www.youtube.com/watch?v=enwT61He6Dw)
 
-// TODO: Ajustar docs
-
 ## Apresentação
 
 Este repositório contém um trabalho acadêmico da disciplina 28743 - DESENVOLVIMENTO MOBILE.
