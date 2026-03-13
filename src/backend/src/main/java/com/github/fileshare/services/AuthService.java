@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import com.github.fileshare.config.StorageProperties;
 import com.github.fileshare.config.entities.PasswordResetTokenEntity;
 import com.github.fileshare.config.entities.RefreshTokenEntity;
+import com.github.fileshare.config.entities.SessionTransferTokenEntity;
 import com.github.fileshare.config.entities.TemporaryUserEntity;
 import com.github.fileshare.config.entities.UserEntity;
 import com.github.fileshare.config.entities.UserSettingsEntity;
@@ -29,13 +31,16 @@ import com.github.fileshare.dto.request.LoginRequest;
 import com.github.fileshare.dto.request.ResetPasswordRequest;
 import com.github.fileshare.dto.request.SignupRequest;
 import com.github.fileshare.dto.response.MfaJwtResponse;
+import com.github.fileshare.dto.response.SessionTransferResponse;
 import com.github.fileshare.dto.response.TokenResponse;
 import com.github.fileshare.exceptions.AuthenticationException;
 import com.github.fileshare.exceptions.MessageFeedbackException;
 import com.github.fileshare.respositories.PasswordResetTokenRepository;
+import com.github.fileshare.respositories.SessionTransferTokenRepository;
 import com.github.fileshare.respositories.TemporaryUserRepository;
 import com.github.fileshare.respositories.UserSettingsRepository;
 import com.github.fileshare.security.JwtUtils;
+import com.github.fileshare.utils.AuthenticatedUserUtils;
 import com.github.fileshare.utils.AuthorizationUtils;
 
 import jakarta.mail.MessagingException;
@@ -59,6 +64,7 @@ public class AuthService {
 	private final TokenRevocationService tokenRevocationService;
 	private final PasswordResetTokenRepository passwordResetTokenRepository;
 	private final RefreshTokenService refreshTokenService;
+	private final SessionTransferTokenRepository sessionTransferTokenRepository;
 	
 	private static final Duration RESET_PASSWORD_TOKEN_VALIDITY = Duration.ofMinutes(30);
 	
@@ -245,5 +251,56 @@ public class AuthService {
 	public void deleteAccount() {
         userService.deleteAccount();
 	}
+	
+	@Transactional
+    public SessionTransferResponse createSessionTransferToken(String target) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new AuthenticationException("Não autenticado");
+        }
+
+        UserEntity userDetails = AuthenticatedUserUtils.requireEnrichedUser();
+
+        Instant now = Instant.now();
+
+        SessionTransferTokenEntity token = new SessionTransferTokenEntity();
+        token.setId(UUID.randomUUID());
+        token.setUser(userDetails);
+        token.setCreatedAt(now);
+        token.setExpiresAt(now.plus(Duration.ofMinutes(2)));
+        token.setUsed(false);
+        token.setTarget(target);
+
+        sessionTransferTokenRepository.save(token);
+        
+        SessionTransferResponse response = new SessionTransferResponse();
+        response.setTransferToken(token.getId().toString());
+
+        return response;
+    }
+    
+    @Transactional
+    public ResponseEntity<?> exchangeSession(String transferToken,
+    		HttpServletResponse response,
+            HttpServletRequest request) {
+        SessionTransferTokenEntity token = sessionTransferTokenRepository
+                .findById(UUID.fromString(transferToken))
+                .orElseThrow(() -> 
+                    new AuthenticationException("Token inválido")
+                );
+
+        // TODO: Criar scheduler para remover tokens espirados e usados após um delay
+        if (token.isUsed() || token.getExpiresAt().isBefore(Instant.now())) {
+            throw new AuthenticationException("Token inválido ou expirado");
+        }
+
+        token.setUsed(true);
+        sessionTransferTokenRepository.save(token);
+
+        TokenResponse tokens = this.generateAuthenticationTokens(response, request, token.getUser());
+
+        return AuthorizationUtils.buildTokenResponse(request, tokens);
+    }
 
 }

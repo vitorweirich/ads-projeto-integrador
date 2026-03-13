@@ -44,7 +44,7 @@ export function VideosProvider({ children }: { children: React.ReactNode }) {
   const { authFetch, user } = useAuth();
 
   const refresh = useCallback(async () => {
-    const res = await authFetch("/v1/videos/me?rows=20");
+    const res = await authFetch("/v1/files/me?rows=20");
     if (!res.ok) throw new Error("Falha ao listar vídeos");
     const page = await res.json();
     const mapped: VideoItem[] = (page?.content || []).map((v: any) => ({
@@ -67,7 +67,7 @@ export function VideosProvider({ children }: { children: React.ReactNode }) {
 
   const requestSignedPut = useCallback(
     async (name: string, size: number, mimeType: string) => {
-      const res = await authFetch("/v1/videos/upload", {
+      const res = await authFetch("/v1/files/upload", {
         method: "POST",
         headers: jsonHeaders,
         body: JSON.stringify({
@@ -151,7 +151,7 @@ export function VideosProvider({ children }: { children: React.ReactNode }) {
   const registerUploaded = useCallback(
     async (videoId: number) => {
       const res = await authFetch(
-        `/v1/videos/upload/${videoId}/register-uploaded`,
+        `/v1/files/upload/${videoId}/register-uploaded`,
         { method: "PATCH" },
       );
       if (!res.ok && res.status !== 204) {
@@ -243,7 +243,7 @@ export function VideosProvider({ children }: { children: React.ReactNode }) {
 
   const getPlaybackUrl = useCallback(
     async (videoId: number) => {
-      const res = await authFetch(`/v1/videos/${videoId}`);
+      const res = await authFetch(`/v1/files/${videoId}`);
       if (!res.ok) throw new Error("Falha ao obter URL do vídeo");
       const data = await res.json();
       // Backend returns SignedUrlDTO: either short link or direct signed URL

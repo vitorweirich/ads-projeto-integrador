@@ -1,11 +1,22 @@
+import { WEB_URL } from "@/constants/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "expo-router";
-import React from "react";
-import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
+import React, { useState } from "react";
+import {
+  Alert,
+  Linking,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const { user, logout } = useAuth();
+  const { user, logout, authFetch } = useAuth();
+
+  // TODO: Corrigir loading compartilhado entre botões.
+  const [loading, setLoading] = useState(false);
 
   React.useEffect(() => {
     if (!user) {
@@ -36,6 +47,29 @@ export default function ProfileScreen() {
     const usedMB = (user.storage.usedQuota / (1024 * 1024)).toFixed(2);
     const limitMB = (user.storage.totalQuota / (1024 * 1024)).toFixed(2);
     return `${usedMB} MB / ${limitMB} MB`;
+  };
+
+  const handleOpenWebPage = async (target: string, errorMessage: string) => {
+    setLoading(true);
+    try {
+      const res = await authFetch("/v1/api/auth/session-transfer", {
+        method: "POST",
+        body: JSON.stringify({ target: "WEB" }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Falha ao gerar token de sessão");
+      }
+
+      const data = await res.json();
+      const url = `${WEB_URL}/session-transfer/${data.transferToken}?destination=${encodeURIComponent(target)}`;
+
+      await Linking.openURL(url);
+    } catch {
+      Alert.alert("Erro", errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -72,6 +106,55 @@ export default function ProfileScreen() {
           </View>
         )}
 
+        <Pressable
+          onPress={() =>
+            handleOpenWebPage(
+              "/profile",
+              "Não foi possível abrir o gerenciamento de conta",
+            )
+          }
+          style={styles.manageButton}
+          disabled={loading}
+        >
+          <Text style={styles.manageText}>
+            {loading ? "Abrindo..." : "Gerenciar Conta"}
+          </Text>
+        </Pressable>
+
+        {user.hasAdminPrivileges && (
+          <>
+            <Pressable
+              onPress={() =>
+                handleOpenWebPage(
+                  "/admin/files",
+                  "Não foi possível abrir a administração de arquivos",
+                )
+              }
+              style={styles.adminButton}
+              disabled={loading}
+            >
+              <Text style={styles.adminText}>
+                {loading ? "Abrindo..." : "Administrar Arquivos"}
+              </Text>
+            </Pressable>
+
+            <Pressable
+              onPress={() =>
+                handleOpenWebPage(
+                  "/admin/users",
+                  "Não foi possível abrir a administração de usuários",
+                )
+              }
+              style={styles.adminButton}
+              disabled={loading}
+            >
+              <Text style={styles.adminText}>
+                {loading ? "Abrindo..." : "Administrar Usuários"}
+              </Text>
+            </Pressable>
+          </>
+        )}
+
         <Pressable onPress={handleLogout} style={styles.logoutButton}>
           <Text style={styles.logoutText}>Sair da Conta</Text>
         </Pressable>
@@ -104,12 +187,36 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "500",
   },
+  manageButton: {
+    backgroundColor: "#2D7856",
+    padding: 16,
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 16,
+  },
+  manageText: {
+    color: "#ffffff",
+    fontWeight: "600",
+    fontSize: 16,
+  },
+  adminButton: {
+    backgroundColor: "#3B5998",
+    padding: 16,
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 8,
+  },
+  adminText: {
+    color: "#ffffff",
+    fontWeight: "600",
+    fontSize: 16,
+  },
   logoutButton: {
     backgroundColor: "#C0392B",
     padding: 16,
     borderRadius: 8,
     alignItems: "center",
-    marginTop: 16,
+    marginTop: 8,
   },
   logoutText: {
     color: "#ffffff",

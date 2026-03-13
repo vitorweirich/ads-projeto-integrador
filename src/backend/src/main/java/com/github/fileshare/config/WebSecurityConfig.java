@@ -64,6 +64,7 @@ public class WebSecurityConfig {
         configuration.setAllowedOrigins(List.of(
             "http://localhost:3000",
             "http://localhost:5173",
+            "http://172.24.80.1:5173",
             "https://tauri.localhost",
             "https://files-ui.vitorweirich.com",
             "https://files.vitorweirich.com",

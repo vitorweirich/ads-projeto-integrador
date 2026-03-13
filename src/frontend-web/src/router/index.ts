@@ -78,6 +78,11 @@ const router = createRouter({
       component: () => import('../views/ConfirmEmailView.vue'),
     },
     {
+      path: '/session-transfer/:token',
+      name: 'session-transfer',
+      component: () => import('../views/SessionTransferView.vue'),
+    },
+    {
       path: '/admin/users',
       name: 'admin-users',
       component: () => import('../views/AdminUsersView.vue'),

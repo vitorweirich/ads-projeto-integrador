@@ -1,8 +1,10 @@
 # TODOs
 
+- Tornar a funcionalidade de upload e visualização pra suportar varios formatos de arquivos
 - Remover modulos do expo que não estao sendo usados
 
-- Configurar links para web:
-1. Esqueci minha senha
-2. Cadastrar mfa na tela de perfil (deve criar uma seção)
-3. Caso for administrador exibir no perfil 'Gerenciar no site' (deve criar uma seção)
+- Tornar interfaces de admin no web minimamente responsivas
+
+
+- Corrigir warning
+>  [expo-av]: Video component from `expo-av` is deprecated in favor of `expo-video`. See the documentation at https://docs.expo.dev/versioons/latest/sdk/video/ for the new API reference.

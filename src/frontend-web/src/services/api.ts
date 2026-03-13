@@ -69,6 +69,7 @@ api.interceptors.response.use(
       '/v1/api/auth/mfa/confirm',
       '/v1/api/auth/login/generate-magic-link',
       '/v1/api/auth/login/magic-link',
+      '/v1/api/auth/session-exchange',
       '/v1/api/auth/confirm/*',
     ]
 
