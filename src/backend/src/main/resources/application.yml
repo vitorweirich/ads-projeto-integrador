@@ -21,7 +21,7 @@ spring:
             required: ${EMAIL_SMTP_STARTTLS_REQUIRED:true}
   datasource:
     driverClassName: org.postgresql.Driver
-    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/postgres}
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/fileshare}
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:postgres}
   jpa:

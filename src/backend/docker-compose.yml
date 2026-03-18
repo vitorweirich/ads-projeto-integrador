@@ -4,7 +4,7 @@ services:
     image: postgres:latest
     command: postgres -c config_file=/etc/postgresql/postgresql.conf
     environment:
-      POSTGRES_DB: postgres
+      POSTGRES_DB: fileshare
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     volumes:
@@ -25,7 +25,6 @@ services:
     # https://mailpit.axllent.org/docs/install/docker/
     image: axllent/mailpit
     container_name: mailpit
-    restart: unless-stopped
     volumes:
       - ./emaildata:/data
     ports:
