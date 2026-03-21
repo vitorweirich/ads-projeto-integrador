@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,8 +29,10 @@ public class ShortLinkController {
     	String originalUrl = linkService.getOriginalUrl(shortUrl);
     	URI uri = URI.create(originalUrl);
     	
-    	if(jsonResponse) {
-    		return ResponseEntity.ok(Map.of("url", uri));
+    	if (jsonResponse) {
+    	    HttpHeaders headers = new HttpHeaders();
+    	    headers.setContentType(MediaType.APPLICATION_JSON);
+    	    return new ResponseEntity<>(Map.of("url", uri), headers, HttpStatus.OK);
     	}
     	
     	HttpHeaders httpHeaders = new HttpHeaders();

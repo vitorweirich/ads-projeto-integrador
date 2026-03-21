@@ -18,7 +18,8 @@ public class S3Config {
 	@Bean
 	public S3Presigner createPresigner (@Value("${CLOUDFLARE_R2_ENDPOINT}") URI cloudflareEndpoint,
 			@Value("${AWS_ACCESS_KEY_ID}") String accessKeyId,
-			@Value("${AWS_SECRET_ACCESS_KEY}") String secretAccessKey) {
+			@Value("${AWS_SECRET_ACCESS_KEY}") String secretAccessKey,
+			@Value("${AWS_REGION:auto}") String region) {
 
 		System.setProperty("aws.accessKeyId", accessKeyId);
 	    System.setProperty("aws.secretAccessKey", secretAccessKey);
@@ -26,7 +27,8 @@ public class S3Config {
 		SystemPropertyCredentialsProvider create = SystemPropertyCredentialsProvider.create();
 		
 		return S3Presigner.builder()
-				.region(Region.of("auto"))
+				// TODO: Colocar region em variavel de ambiente
+				.region(Region.of(region))
 				.credentialsProvider(create)
 				.endpointOverride(cloudflareEndpoint)
 				.serviceConfiguration(S3Configuration.builder().pathStyleAccessEnabled(true).build())
@@ -36,7 +38,8 @@ public class S3Config {
 	@Bean
 	public S3Client createClient (@Value("${CLOUDFLARE_R2_ENDPOINT}") URI cloudflareEndpoint,
 			@Value("${AWS_ACCESS_KEY_ID}") String accessKeyId,
-			@Value("${AWS_SECRET_ACCESS_KEY}") String secretAccessKey) {
+			@Value("${AWS_SECRET_ACCESS_KEY}") String secretAccessKey,
+			@Value("${AWS_REGION:auto}") String region) {
 		
 		System.setProperty("aws.accessKeyId", accessKeyId);
 	    System.setProperty("aws.secretAccessKey", secretAccessKey);
@@ -44,7 +47,7 @@ public class S3Config {
 		SystemPropertyCredentialsProvider create = SystemPropertyCredentialsProvider.create();
 		
 		return S3Client.builder()
-				.region(Region.of("auto"))
+				.region(Region.of(region))
 				.credentialsProvider(create)
 				.endpointOverride(cloudflareEndpoint)
 				.serviceConfiguration(S3Configuration.builder().pathStyleAccessEnabled(true).build())
