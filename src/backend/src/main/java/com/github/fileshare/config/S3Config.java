@@ -27,7 +27,6 @@ public class S3Config {
 		SystemPropertyCredentialsProvider create = SystemPropertyCredentialsProvider.create();
 		
 		return S3Presigner.builder()
-				// TODO: Colocar region em variavel de ambiente
 				.region(Region.of(region))
 				.credentialsProvider(create)
 				.endpointOverride(cloudflareEndpoint)
