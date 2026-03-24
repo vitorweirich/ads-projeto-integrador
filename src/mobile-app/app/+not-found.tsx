@@ -9,7 +9,7 @@ export default function NotFoundScreen() {
       <View style={styles.container}>
         <Text>Esta tela não existe:</Text>
         <Text style={{ fontWeight: "bold", marginVertical: 8 }}>{path}</Text>
-        <Link href="/(tabs)/videos" style={styles.link}>
+        <Link href="/(tabs)/files" style={styles.link}>
           <Text>Ir para tela inicial!</Text>
         </Link>
       </View>

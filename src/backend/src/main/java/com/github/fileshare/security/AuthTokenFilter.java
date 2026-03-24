@@ -46,7 +46,6 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             	String jwt = optionalJwt.get();
             	
             	Claims claims = jwtUtils.getClaimsFromJwtToken(jwt);
-                // TODO: Criar uma constante com uma lista das claims que devem pular a autenticação
             	if (Boolean.TRUE.equals(claims.get(JwtClaims.MFA_PENDING, Boolean.class)) ||
                     Boolean.TRUE.equals(claims.get(JwtClaims.MFA_SETUP, Boolean.class))) {
                     // Token válido mas pendente de MFA ou setup - não autentica
@@ -58,7 +57,6 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 userDetails.setEmail(claims.getSubject());
                 userDetails.setName(claims.get(JwtClaims.USER_NAME, String.class));
                 
-                // TODO: Rever uso de roles
                 @SuppressWarnings("unchecked")
 				List<String> roles = claims.get(JwtClaims.ROLES, List.class);
                 userDetails.setRole(roles.get(0));

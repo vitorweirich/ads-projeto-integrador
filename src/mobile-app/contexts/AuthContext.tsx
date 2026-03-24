@@ -33,8 +33,8 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const STORAGE_KEY = "video-share:user";
-const TOKENS_KEY = "video-share:tokens";
+const STORAGE_KEY = "file-share:user";
+const TOKENS_KEY = "file-share:tokens";
 
 type TokenResponse = { accessToken: string; refreshToken: string };
 

@@ -1,12 +1,12 @@
-import { useVideos } from "@/store/videos";
+import { useFiles } from "@/store/files";
 import { ResizeMode, Video } from "expo-av";
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 
-export default function VideoViewScreen() {
+export default function FileViewScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { getById, getPlaybackUrl } = useVideos();
+  const { getById, getFileSignedUrl } = useFiles();
   const item = useMemo(
     () => (id ? getById(Number(id)) : undefined),
     [id, getById],
@@ -20,7 +20,7 @@ export default function VideoViewScreen() {
       if (!id) return;
       try {
         setLoading(true);
-        const url = await getPlaybackUrl(Number(id));
+        const url = await getFileSignedUrl(Number(id));
         if (mounted) setPlayUrl(url);
       } finally {
         if (mounted) setLoading(false);
@@ -29,12 +29,12 @@ export default function VideoViewScreen() {
     return () => {
       mounted = false;
     };
-  }, [getPlaybackUrl, id]);
+  }, [getFileSignedUrl, id]);
 
   if (!item)
     return (
       <View style={styles.center}>
-        <Text>Vídeo não encontrado.</Text>
+        <Text>Arquivo não encontrado.</Text>
       </View>
     );
 

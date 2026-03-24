@@ -9,7 +9,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import AppHeader from "@/components/AppHeader";
 import StackHeader from "@/components/StackHeader";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { VideosProvider } from "@/store/videos";
+import { FilesProvider } from "@/store/files";
 
 if (__DEV__) {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -29,7 +29,7 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={DefaultTheme}>
       <AuthProvider>
-        <VideosProvider>
+        <FilesProvider>
           <StatusBar style="light" />
 
           <SafeAreaView style={{ flex: 1, backgroundColor: "#1E1A21" }}>
@@ -44,7 +44,7 @@ export default function RootLayout() {
               }}
             >
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen name="video/[id]" options={{ title: "Vídeo" }} />
+              <Stack.Screen name="file/[id]" options={{ title: "Arquivo" }} />
               <Stack.Screen name="login" options={{ title: "Login" }} />
               <Stack.Screen name="+not-found" />
               <Stack.Screen name="cadastro" options={{ title: "Cadastro" }} />
@@ -55,7 +55,7 @@ export default function RootLayout() {
               />
             </Stack>
           </SafeAreaView>
-        </VideosProvider>
+        </FilesProvider>
       </AuthProvider>
     </ThemeProvider>
   );

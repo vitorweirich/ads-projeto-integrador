@@ -1,4 +1,3 @@
-<!-- TODO: Padronizar estilos e atualizar lugares que usam -->
 <template>
   <div
     v-if="visible"

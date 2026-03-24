@@ -10,15 +10,15 @@ import React, {
   useState,
 } from "react";
 
-export type VideoItem = {
+export type FileItem = {
   id: number;
   title: string;
   shareUrl?: string;
   expiresIn?: string; // ISO datetime
 };
 
-type VideosContextType = {
-  videos: VideoItem[];
+type FilesContextType = {
+  files: FileItem[];
   refresh: () => Promise<void>;
   upload: (
     pickedFile: { uri: string; name: string; mimeType: string; size: number },
@@ -32,34 +32,34 @@ type VideosContextType = {
         | "refreshing"
         | "done",
     ) => void,
-  ) => Promise<VideoItem>;
-  getPlaybackUrl: (videoId: number) => Promise<string>;
-  getById: (id: number) => VideoItem | undefined;
+  ) => Promise<FileItem>;
+  getFileSignedUrl: (fileId: number) => Promise<string>;
+  getById: (id: number) => FileItem | undefined;
 };
 
-const VideosContext = createContext<VideosContextType | undefined>(undefined);
+const FilesContext = createContext<FilesContextType | undefined>(undefined);
 
-export function VideosProvider({ children }: { children: React.ReactNode }) {
-  const [videos, setVideos] = useState<VideoItem[]>([]);
+export function FilesProvider({ children }: { children: React.ReactNode }) {
+  const [files, setFiles] = useState<FileItem[]>([]);
   const { authFetch, user } = useAuth();
 
   const refresh = useCallback(async () => {
     const res = await authFetch("/v1/files/me?rows=20");
-    if (!res.ok) throw new Error("Falha ao listar vídeos");
+    if (!res.ok) throw new Error("Falha ao listar arquivos");
     const page = await res.json();
-    const mapped: VideoItem[] = (page?.content || []).map((v: any) => ({
+    const mapped: FileItem[] = (page?.content || []).map((v: any) => ({
       id: v.id,
       title: v.name,
       shareUrl: v.shareUrl,
       expiresIn: v.expiresIn,
     }));
-    setVideos(mapped);
+    setFiles(mapped);
   }, [authFetch]);
 
-  // Keep videos in sync with auth state: clear on logout, refresh on login
+  // Keep files in sync with auth state: clear on logout, refresh on login
   useEffect(() => {
     if (!user) {
-      setVideos([]);
+      setFiles([]);
       return;
     }
     refresh().catch(() => {});
@@ -85,7 +85,7 @@ export function VideosProvider({ children }: { children: React.ReactNode }) {
       const data = await res.json();
       return data as {
         signedUrl: string;
-        videoId: number;
+        fileId: number;
         expirationDate: string;
       };
     },
@@ -149,9 +149,9 @@ export function VideosProvider({ children }: { children: React.ReactNode }) {
   );
 
   const registerUploaded = useCallback(
-    async (videoId: number) => {
+    async (fileId: number) => {
       const res = await authFetch(
-        `/v1/files/upload/${videoId}/register-uploaded`,
+        `/v1/files/upload/${fileId}/register-uploaded`,
         { method: "PATCH" },
       );
       if (!res.ok && res.status !== 204) {
@@ -218,33 +218,33 @@ export function VideosProvider({ children }: { children: React.ReactNode }) {
             effectiveSize,
           );
         } catch (e: any) {
-          // Upload falhou após criar o registro do vídeo no backend
+          // Upload falhou após criar o registro do arquivo no backend
           throw new Error(`Falha no envio do arquivo: ${e?.message || e}`);
         }
 
         onStage?.("registering");
-        await registerUploaded(req.videoId);
+        await registerUploaded(req.fileId);
 
         onStage?.("refreshing");
         await refresh();
 
         onStage?.("done");
         const item =
-          videos.find((v) => v.id === req.videoId) ||
-          ({ id: req.videoId, title: pickedFile.name } as VideoItem);
+          files.find((v) => v.id === req.fileId) ||
+          ({ id: req.fileId, title: pickedFile.name } as FileItem);
         return item;
       } catch (err) {
         // Propaga erro detalhado para a UI
         throw err;
       }
     },
-    [doUploadToSignedUrl, registerUploaded, refresh, requestSignedPut, videos],
+    [doUploadToSignedUrl, registerUploaded, refresh, requestSignedPut, files],
   );
 
-  const getPlaybackUrl = useCallback(
-    async (videoId: number) => {
-      const res = await authFetch(`/v1/files/${videoId}`);
-      if (!res.ok) throw new Error("Falha ao obter URL do vídeo");
+  const getFileSignedUrl = useCallback(
+    async (fileId: number) => {
+      const res = await authFetch(`/v1/files/${fileId}`);
+      if (!res.ok) throw new Error("Falha ao obter URL do arquivo");
       const data = await res.json();
       // Backend returns SignedUrlDTO: either short link or direct signed URL
       return (data?.signedUrl as string) || "";
@@ -253,21 +253,21 @@ export function VideosProvider({ children }: { children: React.ReactNode }) {
   );
 
   const getById = useCallback(
-    (id: number) => videos.find((v) => v.id === id),
-    [videos],
+    (id: number) => files.find((v) => v.id === id),
+    [files],
   );
 
   const value = useMemo(
-    () => ({ videos, refresh, upload, getPlaybackUrl, getById }),
-    [videos, refresh, upload, getPlaybackUrl, getById],
+    () => ({ files, refresh, upload, getFileSignedUrl, getById }),
+    [files, refresh, upload, getFileSignedUrl, getById],
   );
   return (
-    <VideosContext.Provider value={value}>{children}</VideosContext.Provider>
+    <FilesContext.Provider value={value}>{children}</FilesContext.Provider>
   );
 }
 
-export function useVideos() {
-  const ctx = useContext(VideosContext);
-  if (!ctx) throw new Error("useVideos must be used within VideosProvider");
+export function useFiles() {
+  const ctx = useContext(FilesContext);
+  if (!ctx) throw new Error("useFiles must be used within FilesProvider");
   return ctx;
 }

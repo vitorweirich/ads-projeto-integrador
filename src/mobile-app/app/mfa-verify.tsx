@@ -39,7 +39,7 @@ export default function MfaVerifyScreen() {
       Alert.alert("Sucesso", "Login realizado com sucesso!", [
         {
           text: "OK",
-          onPress: () => router.replace("/(tabs)/videos"),
+          onPress: () => router.replace("/(tabs)/files"),
         },
       ]);
     } catch (e: any) {

@@ -12,7 +12,7 @@ export default function TabLayout() {
   const router = useRouter();
   return (
     <Tabs
-      initialRouteName="videos/index"
+      initialRouteName="files/index"
       screenOptions={{
         tabBarActiveTintColor: "#ffffff",
         tabBarInactiveTintColor: "#BFBFBF",
@@ -47,7 +47,7 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="videos/index"
+        name="files/index"
         options={{
           title: "Meus Arquivos",
           tabBarIcon: ({ color }) => (

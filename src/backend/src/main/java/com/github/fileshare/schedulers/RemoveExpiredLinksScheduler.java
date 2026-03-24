@@ -15,7 +15,7 @@ public class RemoveExpiredLinksScheduler {
 	private final SchedulerService service;
 	private final FileStorageService fileStorageService;
 	
-	// TODO: Adicionar shedlock
+	// TODO: Adicionar shedlock (para rodar em ambiente clusterizado)
 	@Scheduled(cron = "0 */10 * * * *")
     public void removeExpiredLinks() {
 		service.removeExpiredLinks();

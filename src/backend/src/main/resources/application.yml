@@ -39,16 +39,14 @@ spring:
     enabled: true
     flywaybaseline-on-migrate: true
 
-AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID_ENV:minioadmin}
-AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY_ENV:minioadmin}
-CLOUDFLARE_R2_ENDPOINT: ${CLOUDFLARE_R2_ENDPOINT_ENV:http://localhost:9000}
+AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID_ENV:GKafc12d36554df7f8d5c4b7ba}
+AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY_ENV:82cd19fd9d8f91dcfeec55e58d30e09888b57a4385dc2122948d0fc20b613108}
+CLOUDFLARE_R2_ENDPOINT: ${CLOUDFLARE_R2_ENDPOINT_ENV:http://localhost:3900}
 
 storage:
-  # TODO: Alterar esses valores só tem efeito em novos usuários criados
   default-max-storage-usage-per-user: ${STORAGE_MAX_STORAGE_USAGE_PER_USER:2147483648} # 2 GB
   default-max-file-retention-days: ${STORAGE_MAX_FILE_RETENTION_DAYS:30}
-  # TODO: Colocar limite mais baixa, bater com o limite do bucket
-  max-storage-usage-total: ${STORAGE_MAX_USAGE_TOTAL:107374182400} # 100 GB
+  max-storage-usage-total: ${STORAGE_MAX_USAGE_TOTAL:2147483648} # 100 GB
 
 admin:
   admin-emails: ${ADMIN_EMAILS:weirichvitor@gmail.com}

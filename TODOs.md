@@ -5,6 +5,7 @@
 ### Geral
 
 - [ ] Rever todos os arquivos de config/envs (docker-compose, application.yml, .env, Dockerfile)
+- [ ] Considerar usar https://zotregistry.dev/v2.1.15/ como Docker Registry
 
 ---
 
@@ -15,7 +16,8 @@
 - [ ] Remover modulos do expo que não estao sendo usados
 - [ ] Corrigir warning
   > [expo-av]: Video component from `expo-av` is deprecated in favor of `expo-video`. See the documentation at https://docs.expo.dev/versioons/latest/sdk/video/ for the new API reference.
-- [ ] Corrigir TODOs comentados no codigo
+- [x] Corrigir TODOs comentados no codigo
+  > OBS: Ainda existem TODOs, mas devem ficar para uma evolução futura
 - [ ] (Opcional) Configurar AppLinks para abrir algumas paginas do site automaticamente caso o APP esteja instalado
   > Tem como pré requisito que o site esteja deployado em PRD com https, de outra forma não será possível testar
 - [ ] Disponibilizar APK do APP para download no no site
@@ -30,11 +32,13 @@
 
 ### Web
 
-- Tornar interfaces de admin no web minimamente responsivas
-- [ ] Corrigir TODOs comentados no codigo
+- [ ] Tornar interfaces de admin no web minimamente responsivas
+- [x] Corrigir TODOs comentados no codigo
+  > OBS: Ainda existem TODOs, mas devem ficar para uma evolução futura
 
 ---
 
 ### Backend
 
 - [ ] Corrigir TODOs comentados no codigo
+  > OBS: Ainda existem TODOs, mas devem ficar para uma evolução futura

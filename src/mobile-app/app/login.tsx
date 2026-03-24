@@ -29,7 +29,7 @@ export default function LoginScreen() {
           params: { token: result.mfaToken },
         });
       } else {
-        router.replace("/(tabs)/videos");
+        router.replace("/(tabs)/files");
       }
     } catch (e: any) {
       Alert.alert("Erro ao entrar", e?.message || "Tente novamente.");

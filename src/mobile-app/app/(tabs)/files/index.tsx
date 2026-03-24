@@ -1,5 +1,5 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { useVideos } from "@/store/videos";
+import { useFiles } from "@/store/files";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useRouter } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
@@ -30,8 +30,8 @@ function formatExpiry(expiresIn?: string) {
   return `${date} ${time}`;
 }
 
-export default function VideosListScreen() {
-  const { videos, refresh } = useVideos();
+export default function FilesListScreen() {
+  const { files, refresh } = useFiles();
   const { user } = useAuth();
   const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
@@ -58,7 +58,7 @@ export default function VideosListScreen() {
           style={{ marginBottom: 12 }}
         />
         <Text style={styles.titleLoggedOut}>
-          Faça login para gerenciar vídeos
+          Faça login para gerenciar arquivos
         </Text>
         <Pressable
           style={styles.primaryButton}
@@ -79,9 +79,9 @@ export default function VideosListScreen() {
   return (
     <View style={styles.container}>
       <FlatList
-        data={videos}
+        data={files}
         keyExtractor={(item) => String(item.id)}
-        contentContainerStyle={videos.length === 0 ? undefined : contentPadding}
+        contentContainerStyle={files.length === 0 ? undefined : contentPadding}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -98,9 +98,9 @@ export default function VideosListScreen() {
               size={56}
               style={{ marginBottom: 12 }}
             />
-            <Text style={styles.emptyTitle}>Nenhum vídeo ainda</Text>
+            <Text style={styles.emptyTitle}>Nenhum arquivo ainda</Text>
             <Text style={styles.emptySubtitle}>
-              Envie seu primeiro vídeo para aparecer aqui
+              Envie seu primeiro arquivo para aparecer aqui
             </Text>
             <Pressable
               style={[styles.primaryButton, { marginTop: 16 }]}
@@ -112,7 +112,7 @@ export default function VideosListScreen() {
                 color="#101010"
                 style={{ marginRight: 8 }}
               />
-              <Text style={styles.primaryButtonText}>Enviar vídeo</Text>
+              <Text style={styles.primaryButtonText}>Enviar arquivo</Text>
             </Pressable>
           </View>
         }
@@ -120,7 +120,7 @@ export default function VideosListScreen() {
           const expiry = formatExpiry(item.expiresIn);
           const onOpen = () =>
             router.push({
-              pathname: "/video/[id]",
+              pathname: "/file/[id]",
               params: { id: String(item.id) },
             } as any);
           const onShare = async () => {

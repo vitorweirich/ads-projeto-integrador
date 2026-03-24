@@ -1,4 +1,4 @@
-import { useVideos } from "@/store/videos";
+import { useFiles } from "@/store/files";
 import * as DocumentPicker from "expo-document-picker";
 import { router } from "expo-router";
 import React, { useMemo, useState } from "react";
@@ -11,8 +11,8 @@ import {
   View,
 } from "react-native";
 
-export default function UploadVideoScreen() {
-  const { upload } = useVideos();
+export default function UploadFileScreen() {
+  const { upload } = useFiles();
   const [title, setTitle] = useState("");
   const [file, setFile] = useState<DocumentPicker.DocumentPickerAsset | null>(
     null,
@@ -30,7 +30,7 @@ export default function UploadVideoScreen() {
   >(null);
   const [feedback, setFeedback] = useState<string | null>(null);
 
-  const pickVideo = async () => {
+  const pickFile = async () => {
     const res = await DocumentPicker.getDocumentAsync({
       type: "video/*",
       multiple: false,
@@ -42,7 +42,7 @@ export default function UploadVideoScreen() {
   const onSubmit = async () => {
     // Inline validation feedback instead of Alert
     if (!file) {
-      setFeedback("Selecione um vídeo");
+      setFeedback("Selecione um arquivo");
       return;
     }
     if (!title) {
@@ -52,7 +52,7 @@ export default function UploadVideoScreen() {
     setFeedback(null);
     setLoading(true);
     try {
-      const name = title || file.name || "video.mp4";
+      const name = title || file.name;
       const size = typeof file.size === "number" ? file.size : 0;
       const mime = file.mimeType || "video/mp4";
       setProgress(0);
@@ -65,11 +65,11 @@ export default function UploadVideoScreen() {
       setFile(null);
       setProgress(0);
       setStage(null);
-      setFeedback("Vídeo enviado com sucesso!");
-      router.replace("/(tabs)/videos");
+      setFeedback("Arquivo enviado com sucesso!");
+      router.replace("/(tabs)/files");
     } catch (e: any) {
       const msg =
-        e?.message || "Falha ao enviar o vídeo. Tente novamente mais tarde.";
+        e?.message || "Falha ao enviar o arquivo. Tente novamente mais tarde.";
       setFeedback(msg);
     } finally {
       setLoading(false);
@@ -77,20 +77,20 @@ export default function UploadVideoScreen() {
   };
 
   const fileLabel = useMemo(() => {
-    if (!file) return "Selecionar Vídeo";
+    if (!file) return "Selecionar Arquivo";
     if (file.name) return file.name;
     // fallback: extract basename from URI
     try {
       const parts = file.uri.split(/[\\/]/);
-      return parts[parts.length - 1] || "Vídeo selecionado";
+      return parts[parts.length - 1] || "Arquivo selecionado";
     } catch {
-      return "Vídeo selecionado";
+      return "Arquivo selecionado";
     }
   }, [file]);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Enviar Vídeo</Text>
+      <Text style={styles.title}>Enviar Arquivo</Text>
       <TextInput
         placeholder="Título"
         placeholderTextColor="#BFBFBF"
@@ -112,7 +112,7 @@ export default function UploadVideoScreen() {
         </Text>
       ) : null}
       <Pressable
-        onPress={pickVideo}
+        onPress={pickFile}
         style={[styles.button, styles.secondary, loading && styles.disabled]}
         disabled={loading}
       >
@@ -148,9 +148,9 @@ export default function UploadVideoScreen() {
               <Text style={styles.stageLabel}>
                 {stage === "preparing" && "Preparando arquivo..."}
                 {stage === "requesting" && "Solicitando URL de upload..."}
-                {stage === "uploading" && "Enviando vídeo..."}
+                {stage === "uploading" && "Enviando arquivo..."}
                 {stage === "registering" && "Finalizando upload..."}
-                {stage === "refreshing" && "Atualizando lista de vídeos..."}
+                {stage === "refreshing" && "Atualizando lista de arquivos..."}
                 {stage === "done" && "Concluído!"}
               </Text>
             )}
@@ -177,7 +177,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: "center",
   },
-  // Darker green for the secondary (Select Video) button
   secondary: { backgroundColor: "#094622ff" },
   disabled: { opacity: 0.6 },
   disabledInput: { opacity: 0.6 },

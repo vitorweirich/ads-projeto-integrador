@@ -33,13 +33,13 @@ Pastas e arquivos principais:
   - `login.tsx` — Tela de Login
   - `cadastro.tsx` — Tela de Cadastro
   - `(tabs)/_layout.tsx` — Layout das abas
-  - `(tabs)/videos/index.tsx` — Tela Meus Vídeos (listagem)
+  - `(tabs)/files/index.tsx` — Tela Meus Vídeos (listagem)
   - `(tabs)/upload/index.tsx` — Tela de Envio de Vídeo
   - `video/[id].tsx` — Tela de Visualização de Vídeo (detalhes/reprodução)
   - `_layout.tsx`, `+not-found.tsx` — Arquivos de layout e fallback
 - `components/` — Componentes reutilizáveis de UI
 - `contexts/AuthContext.tsx` — Contexto de autenticação
-- `store/videos.tsx` — Estado/armazenamento local de vídeos
+- `store/files.tsx` — Estado/armazenamento local de vídeos
 - `constants/api.ts` — Configurações auxiliares (endpoints, etc.)
 - `assets/` — Imagens, fontes e ícones
 - `layout (Protótipo)/` — Protótipos e documento de requisitos
@@ -48,7 +48,7 @@ Telas previstas/implementadas:
 
 - Login (`app/login.tsx`)
 - Cadastro (`app/cadastro.tsx`)
-- Meus Vídeos / Listagem (`app/(tabs)/videos/index.tsx`)
+- Meus Vídeos / Listagem (`app/(tabs)/files/index.tsx`)
 - Envio de Vídeo (`app/(tabs)/upload/index.tsx`)
 - Visualização de Vídeo (`app/video/[id].tsx`)
 
@@ -85,12 +85,12 @@ Este projeto usa [file-based routing](https://docs.expo.dev/router/introduction)
 
 ## Integração com o Backend
 
-Esta seção descreve como o app consome as APIs do backend e como a autenticação e o fluxo de upload/reprodução de vídeos funcionam.
+Esta seção descreve como o app consome as APIs do backend e como a autenticação e o fluxo de upload/reprodução de arquivos funcionam.
 
 ### Configuração da URL base
 
 - O arquivo `constants/api.ts` define a URL base da API em `API_URL`.
-- Por padrão, usa `https://native.videos.vitorweirich.com`.
+- Por padrão, usa `https://native.files.vitorweirich.com`.
 - É possível sobrescrever em tempo de build/execução definindo a variável de ambiente `EXPO_PUBLIC_API_URL` (qualquer valor `EXPO_PUBLIC_*` fica disponível no bundle do app). Ex.: para apontar para um backend local, defina `EXPO_PUBLIC_API_URL=http://10.0.2.2:8080` (Android Emulator).
 - O objeto `jsonHeaders` centraliza os headers JSON e inclui `X-Http-Only: false` para que o backend retorne os tokens no corpo da resposta ao invés de cookies HttpOnly.
 
@@ -105,6 +105,7 @@ Implementado em `contexts/AuthContext.tsx`.
 - Login: `POST /v1/api/auth/login` com `{ email, password }`.
   - Espera receber `{ accessToken, refreshToken }` no corpo da resposta.
   - Tokens são persistidos no AsyncStorage e adicionados como `Authorization: Bearer <accessToken>` em todas as requisições autenticadas.
+    // TODO: Ajustar linha abaixo, no sentido que nesse app ajustado, foi implementado o fluxo de mfa completo (no login)
   - Caso o backend retorne `{ token }` (fluxo de MFA), o app informa o usuário para finalizar a verificação em outro canal.
 - Registro: `POST /v1/api/auth/register` com `{ name, email, password }` (envio de e-mail de confirmação).
 - Perfil: `GET /v1/api/auth/me` retorna dados do usuário logado; usado na inicialização e após o login para popular `user`.
@@ -119,17 +120,17 @@ Headers relevantes:
 
 ### Gerenciamento de vídeos
 
-Implementado em `store/videos.tsx` via contexto `VideosProvider`.
+Implementado em `store/files.tsx` via contexto `VideosProvider`.
 
-- Listar meus vídeos: `GET /v1/videos/me?rows=20`
+- Listar meus vídeos: `GET /v1/files/me?rows=20`
   - Mapeia a resposta (Page<VideoDTO>) para `{ id, title, shareUrl, expiresIn }`.
 - Upload de vídeo (assinado):
-  1. Solicitar URL de upload: `POST /v1/videos/upload` com `{ fileName, fileSize, contentType }`.
+  1. Solicitar URL de upload: `POST /v1/files/upload` com `{ fileName, fileSize, contentType }`.
      - Resposta esperada: `{ signedUrl, videoId, expirationDate }`.
   2. Enviar o arquivo binário para `signedUrl` via `PUT` (o app usa `expo-file-system` e `createUploadTask` para acompanhar progresso).
-  3. Registrar upload concluído: `PATCH /v1/videos/upload/{videoId}/register-uploaded` (204 esperado).
+  3. Registrar upload concluído: `PATCH /v1/files/upload/{videoId}/register-uploaded` (204 esperado).
   4. Atualizar listagem chamando novamente a API de listagem.
-- Obter URL de reprodução: `GET /v1/videos/{id}`
+- Obter URL de reprodução: `GET /v1/files/{id}`
   - Retorna um `signedUrl` temporário para reprodução/streaming no player (`expo-av`).
 
 ### Tratamento de erros e segurança
@@ -142,4 +143,4 @@ Implementado em `store/videos.tsx` via contexto `VideosProvider`.
 ### Referências de código
 
 - `contexts/AuthContext.tsx` — fluxo de login, refresh, logout, `authFetch`.
-- `store/videos.tsx` — listagem, solicitação de URL assinada, upload com progresso, registro de upload e obtenção de URL de playback.
+- `store/files.tsx` — listagem, solicitação de URL assinada, upload com progresso, registro de upload e obtenção de URL de playback.

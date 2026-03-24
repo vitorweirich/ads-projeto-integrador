@@ -124,7 +124,6 @@ router.beforeEach(async (to, from, next) => {
   }
 
   if (requiresAdmin && !authStore.isAdmin) {
-    // TODO: Talvez adicionar uma mensagem (toast)?
     return next({ name: 'home' })
   }
 

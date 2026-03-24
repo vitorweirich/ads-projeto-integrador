@@ -85,7 +85,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 				.body(new ErrorResponse("AUTHENTICATION_ERROR", ex.getMessage()));
 	}
 
-	// TODO: Melhorar mensagem
 	@ExceptionHandler(IllegalArgumentException.class)
 	public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex) {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST)

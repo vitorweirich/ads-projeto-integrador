@@ -142,7 +142,6 @@ public class AuthService {
             usuarioTemp = usuarioTempOpt.get();
             expirado = now.isAfter(usuarioTemp.getExpiresAt());
         }
-        // TODO: Se exister e não estiver expirado, talvez enviar mensagem para confirmar o email?
         if (emailDefinitivo || (emailTemporario && !expirado)) {
             throw new AuthenticationException("Este email já está em uso");
         }

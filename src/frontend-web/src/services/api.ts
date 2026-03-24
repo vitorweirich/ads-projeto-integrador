@@ -43,11 +43,6 @@ api.interceptors.response.use(
           case 'refresh-user':
             await useAuthStore().fetchUser(true)
             break
-          // case 'show-message':
-          //   // TODO: Pensar em estrutura para pegar a mensagem.
-          //   // OBS: Essa funcionalidade seria melhor aproveitada em respostas de erro, provavelmente
-          //   useToastStore().show('Administrador notificado com sucesso!', 'info')
-          //   break
           default:
             console.warn(`Ação desconhecida recebida: ${action}`)
         }
