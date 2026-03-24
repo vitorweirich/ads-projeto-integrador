@@ -41,3 +41,19 @@ Descricao breve: wireframes e fluxo visual simplificado das telas principais do 
 Descricao breve: Centralizacao dos diagramas projeto.
 
 - [Ver README de diagramas](./docs/diagramas/README.md)
+
+### Demonstrações
+
+### App mobile
+
+Link para apresentação do projeto no [YouTube](https://www.youtube.com/watch?v=enwT61He6Dw)
+
+> OBS: Essa apresentação trata-se do projeto base, onde a funcionalidade de upload estava restrita a vídeos, porém todos os conceitos apresentados se mantém
+
+### Site
+
+TODO
+
+### Backend
+
+TODO

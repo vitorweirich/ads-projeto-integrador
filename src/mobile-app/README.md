@@ -1,29 +1,43 @@
-# VideoShare Mobile
+# FileShare Mobile
 
 Aplicativo desenvolvido com [Expo](https://expo.dev) e React Native, utilizando o roteador expo-router e a navegação do ecossistema React Navigation.
 
-Link para esse arquivo no [github](https://github.com/vitorweirich/file-share-mobile)
-
-Link para apresentação do projeto no [youtube](https://www.youtube.com/watch?v=enwT61He6Dw)
+Link para apresentação do projeto no [YouTube](https://www.youtube.com/watch?v=enwT61He6Dw)
 
 ## Apresentação
 
-Este repositório contém um trabalho acadêmico da disciplina 28743 - DESENVOLVIMENTO MOBILE.
+Este repositório contém o trabalho acadêmico da disciplina **30062 - Projeto Integrador**.
 
-- Aluno(a): Vitor Mateus Weirich (weirichvitor@gmail.com)
+Este projeto é uma **evolução direta** do repositório base:
+https://github.com/vitorweirich/video-share-mobile
+
+O projeto original (**VideoShare**) foi desenvolvido com foco no **upload e compartilhamento de vídeos temporários**.  
+Já o presente projeto (**FileShare**) expande essa proposta, permitindo o **upload e gerenciamento de diferentes tipos de arquivos**, não se limitando apenas a vídeos.
+
+Essa mudança também motivou a renomeação do projeto, de _VideoShare_ para _FileShare_.
+
+### Informações acadêmicas
+
+- Aluno: Vitor Mateus Weirich (weirichvitor@gmail.com)
+- Código: 369881
 - Turma: EAD54-12
-- Professor(a): Alysson Oliveira
-- Disciplina: 28743 - DESENVOLVIMENTO MOBILE
+- Professor: Alysson Borges
+- Disciplina: 30062 - Projeto Integrador - EAD54-12
+
+## Documentação
 
 Documento de requisitos e protótipos (wireframes/mockups):
 
 - Caminho no repositório: `layout (Protótipo)/Requisitos e Propósta de Layout (Protótipo).md`
-- Link direto (GitHub): https://github.com/vitorweirich/file-share-mobile/blob/master/layout%20(Protótipo)/Requisitos%20e%20Propósta%20de%20Layout%20(Protótipo).md
+- Repositório base (GitHub): https://github.com/vitorweirich/video-share-mobile
 
-Principais requisitos funcionais definidos no documento:
+## Principais requisitos funcionais
 
 - Autenticação (Login e Cadastro)
-- Gerenciamento de vídeos: Meus Vídeos (listagem), Visualização de Vídeo e Envio de Vídeo
+- Gerenciamento de arquivos:
+  - Listagem (Meus Arquivos)
+  - Visualização de arquivos
+  - Upload de arquivos
 
 ## Estrutura básica do projeto
 
@@ -105,8 +119,7 @@ Implementado em `contexts/AuthContext.tsx`.
 - Login: `POST /v1/api/auth/login` com `{ email, password }`.
   - Espera receber `{ accessToken, refreshToken }` no corpo da resposta.
   - Tokens são persistidos no AsyncStorage e adicionados como `Authorization: Bearer <accessToken>` em todas as requisições autenticadas.
-    // TODO: Ajustar linha abaixo, no sentido que nesse app ajustado, foi implementado o fluxo de mfa completo (no login)
-  - Caso o backend retorne `{ token }` (fluxo de MFA), o app informa o usuário para finalizar a verificação em outro canal.
+    - Caso o backend retorne `{ token }` (indicando etapa intermediária do MFA), o app conduz o usuário pelo fluxo completo de autenticação multifator, solicitando e validando o código de verificação recebido no canal secundário.
 - Registro: `POST /v1/api/auth/register` com `{ name, email, password }` (envio de e-mail de confirmação).
 - Perfil: `GET /v1/api/auth/me` retorna dados do usuário logado; usado na inicialização e após o login para popular `user`.
 - Refresh: `POST /v1/api/auth/refresh` com header `X-Refresh-Token`.
