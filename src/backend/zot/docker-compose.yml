@@ -1,0 +1,14 @@
+version: "3.8"
+
+services:
+  zot:
+    image: ghcr.io/project-zot/zot:latest
+    container_name: zot
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./data:/var/lib/zot
+      - ./config.json:/etc/zot/config.json:ro
+      - ./htpasswd:/etc/zot/htpasswd:ro
+    command: ["serve", "/etc/zot/config.json"]
