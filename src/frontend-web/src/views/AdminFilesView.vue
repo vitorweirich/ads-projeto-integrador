@@ -124,38 +124,77 @@ onMounted(fetchFiles)
         <div v-if="files.length === 0" class="text-center">Nenhum arquivo encontrado.</div>
 
         <div v-else>
-          <div class="grid grid-cols-4 gap-4 border-b py-2 font-semibold text-gray-700">
-            <div>ID</div>
-            <div>Nome</div>
-            <div>Status</div>
-            <div class="text-right">Ações</div>
+          <!-- Desktop: tabela com grid -->
+          <div class="hidden md:block">
+            <div class="grid grid-cols-4 gap-4 border-b py-2 font-semibold text-gray-700">
+              <div>ID</div>
+              <div>Nome</div>
+              <div>Status</div>
+              <div class="text-right">Ações</div>
+            </div>
+            <ul class="divide-y">
+              <li
+                v-for="file in files"
+                :key="file.id"
+                class="grid grid-cols-4 items-center gap-4 py-4"
+              >
+                <div class="font-semibold">#{{ file.id }}</div>
+                <div class="group relative max-w-full">
+                  <div class="truncate text-lg font-bold" :title="file.name">
+                    {{ file.name }}
+                  </div>
+                  <div
+                    class="absolute top-full left-0 z-10 mt-1 hidden w-max max-w-screen-md rounded bg-gray-800 px-2 py-1 text-sm text-white shadow group-hover:block dark:bg-gray-500"
+                  >
+                    {{ file.name }}
+                  </div>
+                </div>
+                <div>
+                  <span :class="file.uploaded ? 'text-green-600' : 'text-red-600'">
+                    {{ file.uploaded ? 'Upload completo' : 'Pendente' }}
+                  </span>
+                </div>
+                <div class="flex justify-end gap-2">
+                  <button
+                    class="rounded px-3 py-1"
+                    :disabled="!file.uploaded"
+                    @click="viewFile(file)"
+                  >
+                    Visualizar
+                  </button>
+                  <button class="bg-danger rounded px-3 py-1" @click="openDeleteModal(file)">
+                    Deletar
+                  </button>
+                </div>
+              </li>
+            </ul>
           </div>
 
-          <ul class="divide-y">
-            <li
-              v-for="file in files"
-              :key="file.id"
-              class="grid grid-cols-4 items-center gap-4 py-4"
-            >
-              <div class="font-semibold">#{{ file.id }}</div>
-              <div class="group relative max-w-full">
-                <div class="truncate text-lg font-bold" :title="file.name">
-                  {{ file.name }}
-                </div>
-                <div
-                  class="absolute top-full left-0 z-10 mt-1 hidden w-max max-w-screen-md rounded bg-gray-800 px-2 py-1 text-sm text-white shadow group-hover:block dark:bg-gray-500"
+          <!-- Mobile: cards -->
+          <ul class="flex flex-col gap-4 md:hidden">
+            <li v-for="file in files" :key="file.id" class="rounded-lg border p-4 shadow-sm">
+              <div class="mb-2 flex items-center justify-between">
+                <span class="text-xs font-semibold text-gray-500">#{{ file.id }}</span>
+                <span
+                  class="rounded-full px-2 py-0.5 text-xs font-semibold"
+                  :class="file.uploaded ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'"
                 >
-                  {{ file.name }}
-                </div>
-              </div>
-              <div>
-                <span :class="file.uploaded ? 'text-green-600' : 'text-red-600'">
-                  {{ file.uploaded ? 'Upload completo' : 'Pendente' }}
+                  {{ file.uploaded ? 'Completo' : 'Pendente' }}
                 </span>
               </div>
-              <div class="flex justify-end gap-2">
-                <button class="rounded px-3 py-1" @click="viewFile(file)">Visualizar</button>
-                <button class="bg-danger rounded px-3 py-1" @click="openDeleteModal(file)">
+              <p class="mb-3 truncate text-base font-bold" :title="file.name">{{ file.name }}</p>
+              <div class="flex gap-2">
+                <button
+                  class="flex-1 rounded px-3 py-2 text-sm"
+                  :disabled="!file.uploaded"
+                  @click="viewFile(file)"
+                >
+                  Visualizar
+                </button>
+                <button
+                  class="bg-danger flex-1 rounded px-3 py-2 text-sm"
+                  @click="openDeleteModal(file)"
+                >
                   Deletar
                 </button>
               </div>
@@ -186,11 +225,15 @@ onMounted(fetchFiles)
 
     <div
       v-if="showModal"
-      class="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
     >
-      <div class="relative w-full max-w-3xl rounded-lg bg-black p-6 shadow-lg">
+      <div
+        class="relative flex max-h-[90vh] w-full max-w-3xl flex-col rounded-lg bg-black p-4 shadow-lg sm:p-6"
+      >
         <h2 class="mb-4 text-xl font-bold">{{ selectedFileName }}</h2>
-        <FileVisualizer :file-type="selectedFileContentType" :file-url="selectedFileUrl" />
+        <div class="min-h-0 flex-1 overflow-auto">
+          <FileVisualizer :file-type="selectedFileContentType" :file-url="selectedFileUrl" />
+        </div>
         <button
           class="bg-secondary absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full text-white focus:outline-none"
           @click="showModal = false"

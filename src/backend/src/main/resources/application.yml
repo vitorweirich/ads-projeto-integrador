@@ -39,10 +39,6 @@ spring:
     enabled: true
     flywaybaseline-on-migrate: true
 
-AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID_ENV:GKafc12d36554df7f8d5c4b7ba}
-AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY_ENV:82cd19fd9d8f91dcfeec55e58d30e09888b57a4385dc2122948d0fc20b613108}
-CLOUDFLARE_R2_ENDPOINT: ${CLOUDFLARE_R2_ENDPOINT_ENV:http://localhost:3900}
-
 storage:
   default-max-storage-usage-per-user: ${STORAGE_MAX_STORAGE_USAGE_PER_USER:2147483648} # 2 GB
   default-max-file-retention-days: ${STORAGE_MAX_FILE_RETENTION_DAYS:30}
@@ -52,6 +48,11 @@ admin:
   admin-emails: ${ADMIN_EMAILS:weirichvitor@gmail.com}
 
 app:
+  s3:
+    access-key: ${S3_ACCESS_KEY:GKafc12d36554df7f8d5c4b7ba}
+    secret-key: ${S3_SECRET_KEY:abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789}
+    endpoint: ${S3_ENDPOINT:http://localhost:3900}
+    region: ${S3_REGION:garage}
   jwt:
     secret: ${JWT_SECRET:chave-super-secreta-de-64-bytes-exatamente-para-HS512!!!1234567890}
     access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:900}

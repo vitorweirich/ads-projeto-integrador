@@ -1,13 +1,13 @@
 <template>
   <div v-if="fileUrl && fileType" class="mb-6 flex justify-center">
     <template v-if="fileUrl && fileType.startsWith('video')">
-      <video :src="fileUrl" controls class="mx-auto mb-4 max-w-full rounded shadow" />
+      <video :src="fileUrl" controls class="mx-auto mb-4 max-h-[70vh] max-w-full rounded shadow" />
     </template>
     <template v-else-if="fileUrl && fileType.startsWith('image')">
       <img
         :src="fileUrl"
         alt="Pré-visualização da imagem"
-        class="mx-auto mb-4 max-w-full rounded shadow"
+        class="mx-auto mb-4 max-h-[70vh] max-w-full rounded shadow"
       />
     </template>
     <template v-else-if="fileUrl && fileType === 'application/pdf'">

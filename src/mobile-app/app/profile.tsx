@@ -15,8 +15,7 @@ export default function ProfileScreen() {
   const router = useRouter();
   const { user, logout, authFetch } = useAuth();
 
-  // TODO: Corrigir loading compartilhado entre botões.
-  const [loading, setLoading] = useState(false);
+  const [loadingTarget, setLoadingTarget] = useState<string | null>(null);
 
   React.useEffect(() => {
     if (!user) {
@@ -50,7 +49,7 @@ export default function ProfileScreen() {
   };
 
   const handleOpenWebPage = async (target: string, errorMessage: string) => {
-    setLoading(true);
+    setLoadingTarget(target);
     try {
       const res = await authFetch("/v1/api/auth/session-transfer", {
         method: "POST",
@@ -68,7 +67,7 @@ export default function ProfileScreen() {
     } catch {
       Alert.alert("Erro", errorMessage);
     } finally {
-      setLoading(false);
+      setLoadingTarget(null);
     }
   };
 
@@ -114,10 +113,10 @@ export default function ProfileScreen() {
             )
           }
           style={styles.manageButton}
-          disabled={loading}
+          disabled={loadingTarget !== null}
         >
           <Text style={styles.manageText}>
-            {loading ? "Abrindo..." : "Gerenciar Conta"}
+            {loadingTarget === "/profile" ? "Abrindo..." : "Gerenciar Conta"}
           </Text>
         </Pressable>
 
@@ -131,10 +130,12 @@ export default function ProfileScreen() {
                 )
               }
               style={styles.adminButton}
-              disabled={loading}
+              disabled={loadingTarget !== null}
             >
               <Text style={styles.adminText}>
-                {loading ? "Abrindo..." : "Administrar Arquivos"}
+                {loadingTarget === "/admin/files"
+                  ? "Abrindo..."
+                  : "Administrar Arquivos"}
               </Text>
             </Pressable>
 
@@ -146,10 +147,12 @@ export default function ProfileScreen() {
                 )
               }
               style={styles.adminButton}
-              disabled={loading}
+              disabled={loadingTarget !== null}
             >
               <Text style={styles.adminText}>
-                {loading ? "Abrindo..." : "Administrar Usuários"}
+                {loadingTarget === "/admin/users"
+                  ? "Abrindo..."
+                  : "Administrar Usuários"}
               </Text>
             </Pressable>
           </>

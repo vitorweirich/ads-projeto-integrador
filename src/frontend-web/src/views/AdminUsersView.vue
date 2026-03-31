@@ -94,54 +94,92 @@ onMounted(fetchUsers)
         <div v-if="users.length === 0" class="text-center">Nenhum usuário encontrado.</div>
 
         <div v-else>
-          <div class="grid grid-cols-13 gap-4 border-b py-2 font-semibold text-gray-700">
-            <div class="col-span-3">Nome</div>
-            <div class="col-span-4">Email</div>
-            <div class="col-span-2">MFA Status</div>
-            <div class="col-span-2">Storage Quota</div>
-            <div class="col-span-2 text-right">Ações</div>
+          <!-- Desktop: tabela com grid -->
+          <div class="hidden lg:block">
+            <div class="grid grid-cols-13 gap-4 border-b py-2 font-semibold text-gray-700">
+              <div class="col-span-3">Nome</div>
+              <div class="col-span-4">Email</div>
+              <div class="col-span-2">MFA Status</div>
+              <div class="col-span-2">Storage Quota</div>
+              <div class="col-span-2 text-right">Ações</div>
+            </div>
+            <ul class="divide-y">
+              <li
+                v-for="user in users"
+                :key="user.id"
+                class="grid grid-cols-13 items-center gap-4 py-4"
+              >
+                <div class="col-span-3 font-medium">{{ user.name }}</div>
+                <div class="col-span-4 text-sm text-gray-600">{{ user.email }}</div>
+                <div class="col-span-2 text-sm">
+                  MFA:
+                  <span :class="user.mfaEnabled ? 'text-green-600' : 'text-red-600'">
+                    {{ user.mfaEnabled ? 'Ativo' : 'Desativado' }}
+                  </span>
+                </div>
+                <div
+                  class="col-span-2 flex flex-col items-start gap-2"
+                  :title="`${user.usedQuota}% usado`"
+                >
+                  <span class="text-sm text-gray-700 dark:text-gray-300">
+                    {{ formatBytes(user.totalSize) }} /
+                    {{ formatBytes(user.settings.storageLimitBytes) }}
+                  </span>
+                  <div class="h-2 w-24 overflow-hidden rounded-full bg-gray-300 dark:bg-gray-700">
+                    <div
+                      class="h-full bg-blue-600 transition-all"
+                      :style="{ width: user.usedQuota + '%' }"
+                    ></div>
+                  </div>
+                </div>
+                <div class="col-span-2 text-right">
+                  <button
+                    :disabled="!user.mfaEnabled"
+                    class="rounded px-3 py-1"
+                    @click="openResetModal(user)"
+                  >
+                    Resetar MFA
+                  </button>
+                </div>
+              </li>
+            </ul>
           </div>
-          <ul class="divide-y">
+
+          <!-- Mobile: cards -->
+          <ul class="flex flex-col gap-4 lg:hidden">
             <li
               v-for="user in users"
               :key="user.id"
-              class="grid grid-cols-13 items-center gap-4 py-4"
+              class="rounded-lg border p-4 shadow-sm"
             >
-              <div class="col-span-3 font-medium">{{ user.name }}</div>
-              <div class="col-span-4 text-sm text-gray-600">{{ user.email }}</div>
-              <div class="col-span-2 text-sm">
-                MFA:
-                <span :class="user.mfaEnabled ? 'text-green-600' : 'text-red-600'">
-                  {{ user.mfaEnabled ? 'Ativo' : 'Desativado' }}
+              <div class="mb-2 flex items-center justify-between">
+                <span class="text-lg font-medium">{{ user.name }}</span>
+                <span
+                  class="rounded-full px-2 py-0.5 text-xs font-semibold"
+                  :class="user.mfaEnabled ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'"
+                >
+                  MFA {{ user.mfaEnabled ? 'Ativo' : 'Off' }}
                 </span>
               </div>
-              <div
-                class="col-span-2 flex flex-col items-start gap-2"
-                :title="`${user.usedQuota}% usado`"
-              >
-                <span class="text-sm text-gray-700 dark:text-gray-300">
-                  {{ formatBytes(user.totalSize) }} /
-                  {{ formatBytes(user.settings.storageLimitBytes) }}
+              <p class="mb-3 truncate text-sm text-gray-600">{{ user.email }}</p>
+              <div class="mb-3" :title="`${user.usedQuota}% usado`">
+                <span class="text-xs text-gray-700 dark:text-gray-300">
+                  {{ formatBytes(user.totalSize) }} / {{ formatBytes(user.settings.storageLimitBytes) }}
                 </span>
-
-                <div class="h-2 w-24 overflow-hidden rounded-full bg-gray-300 dark:bg-gray-700">
+                <div class="mt-1 h-2 w-full overflow-hidden rounded-full bg-gray-300 dark:bg-gray-700">
                   <div
                     class="h-full bg-blue-600 transition-all"
-                    :style="{
-                      width: user.usedQuota + '%',
-                    }"
+                    :style="{ width: user.usedQuota + '%' }"
                   ></div>
                 </div>
               </div>
-              <div class="col-span-2 text-right">
-                <button
-                  :disabled="!user.mfaEnabled"
-                  class="rounded px-3 py-1"
-                  @click="openResetModal(user)"
-                >
-                  Resetar MFA
-                </button>
-              </div>
+              <button
+                :disabled="!user.mfaEnabled"
+                class="w-full rounded px-3 py-2 text-sm"
+                @click="openResetModal(user)"
+              >
+                Resetar MFA
+              </button>
             </li>
           </ul>
         </div>
@@ -170,9 +208,9 @@ onMounted(fetchUsers)
     <!-- Modal de Confirmação -->
     <div
       v-if="showConfirmModal"
-      class="bg-opacity-50 fixed inset-0 flex items-center justify-center bg-black"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
     >
-      <div class="w-96 rounded-lg bg-fuchsia-700 p-6 shadow-lg">
+      <div class="w-full max-w-sm rounded-lg bg-fuchsia-700 p-6 shadow-lg sm:max-w-md">
         <h2 class="mb-4 text-xl font-semibold">Confirmar redefinição do MFA</h2>
         <p class="mb-4">
           Tem certeza que deseja resetar o MFA de <strong>{{ userToReset?.name }}</strong

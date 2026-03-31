@@ -98,10 +98,10 @@ services:
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
 
-      # Variáveis MinIO (exemplo)
-      AWS_ACCESS_KEY_ID_ENV: minioadmin
-      AWS_SECRET_ACCESS_KEY_ENV: minioadmin
-      CLOUDFLARE_R2_ENDPOINT_ENV: http://host.docker.internal:9000
+      # Variáveis S3 (exemplo)
+      S3_ACCESS_KEY: minioadmin
+      S3_SECRET_KEY: minioadmin
+      S3_ENDPOINT: http://host.docker.internal:9000
 
       ADMIN_EMAILS: 'weirichvitor@gmail.com,user_teste1@teste.com,user_teste2@teste.com'
 

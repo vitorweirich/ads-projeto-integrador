@@ -62,4 +62,4 @@ Esse script irá:
 
 ## Utilizar API KEY gerada
 
-Substitua no arquivo `src\backend\src\main\resources\application.yml` as envs `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` e `CLOUDFLARE_R2_ENDPOINT` pelos valores no `.env` gerado.
+Substitua no arquivo `src\backend\src\main\resources\application.yml` as envs `S3_ACCESS_KEY`, `S3_SECRET_KEY` e `S3_ENDPOINT` pelos valores no `.env` gerado.

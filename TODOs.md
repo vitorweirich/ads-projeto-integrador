@@ -32,7 +32,8 @@
 
 ### Web
 
-- [ ] Tornar interfaces de admin no web minimamente responsivas
+- [x] Tornar interfaces de admin no web minimamente responsivas
+  > Implementado layout responsivo com cards em mobile e tabela em desktop para AdminUsersView e AdminFilesView. Header também responsivo com 3 tiers (mobile/intermediário/desktop).
 - [x] Corrigir TODOs comentados no codigo
   > OBS: Ainda existem TODOs, mas devem ficar para uma evolução futura
 
@@ -40,5 +41,5 @@
 
 ### Backend
 
-- [ ] Corrigir TODOs comentados no codigo
+- [x] Corrigir TODOs comentados no codigo
   > OBS: Ainda existem TODOs, mas devem ficar para uma evolução futura
