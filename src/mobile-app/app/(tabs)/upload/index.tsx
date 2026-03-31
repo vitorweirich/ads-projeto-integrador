@@ -32,7 +32,18 @@ export default function UploadFileScreen() {
 
   const pickFile = async () => {
     const res = await DocumentPicker.getDocumentAsync({
-      type: "video/*",
+      type: [
+        "video/mp4",
+        "video/x-msvideo",
+        "video/x-matroska",
+        "video/quicktime",
+        "video/x-ms-wmv",
+        "video/mp2t",
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "application/pdf",
+      ],
       multiple: false,
     });
     if (res.canceled) return;
@@ -54,7 +65,7 @@ export default function UploadFileScreen() {
     try {
       const name = title || file.name;
       const size = typeof file.size === "number" ? file.size : 0;
-      const mime = file.mimeType || "video/mp4";
+      const mime = file.mimeType || "application/octet-stream";
       setProgress(0);
       await upload(
         { uri: file.uri, name, size, mimeType: mime },

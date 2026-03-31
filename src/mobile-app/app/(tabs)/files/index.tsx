@@ -1,5 +1,5 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { useFiles } from "@/store/files";
+import { type FileItem, useFiles } from "@/store/files";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useRouter } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
@@ -35,6 +35,14 @@ export default function FilesListScreen() {
   const { user } = useAuth();
   const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
+
+  const getFileIcon = (item: FileItem): keyof typeof MaterialIcons.glyphMap => {
+    const ct = item.contentType || "";
+    if (ct.startsWith("video/")) return "movie";
+    if (ct.startsWith("image/")) return "image";
+    if (ct === "application/pdf") return "picture-as-pdf";
+    return "insert-drive-file";
+  };
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -139,7 +147,11 @@ export default function FilesListScreen() {
             >
               <View style={styles.row}>
                 <View style={styles.thumb}>
-                  <MaterialIcons name="movie" size={22} color="#E6DAF2" />
+                  <MaterialIcons
+                    name={getFileIcon(item)}
+                    size={22}
+                    color="#E6DAF2"
+                  />
                 </View>
                 <View style={styles.info}>
                   <Text style={styles.title} numberOfLines={1}>

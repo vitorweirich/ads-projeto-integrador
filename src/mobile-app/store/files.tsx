@@ -15,6 +15,7 @@ export type FileItem = {
   title: string;
   shareUrl?: string;
   expiresIn?: string; // ISO datetime
+  contentType?: string;
 };
 
 type FilesContextType = {
@@ -52,6 +53,7 @@ export function FilesProvider({ children }: { children: React.ReactNode }) {
       title: v.name,
       shareUrl: v.shareUrl,
       expiresIn: v.expiresIn,
+      contentType: v.contentType,
     }));
     setFiles(mapped);
   }, [authFetch]);
@@ -231,7 +233,11 @@ export function FilesProvider({ children }: { children: React.ReactNode }) {
         onStage?.("done");
         const item =
           files.find((v) => v.id === req.fileId) ||
-          ({ id: req.fileId, title: pickedFile.name } as FileItem);
+          ({
+            id: req.fileId,
+            title: pickedFile.name,
+            contentType: pickedFile.mimeType,
+          } as FileItem);
         return item;
       } catch (err) {
         // Propaga erro detalhado para a UI
