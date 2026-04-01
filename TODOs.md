@@ -36,10 +36,12 @@
   > Implementado layout responsivo com cards em mobile e tabela em desktop para AdminUsersView e AdminFilesView. Header também responsivo com 3 tiers (mobile/intermediário/desktop).
 - [x] Corrigir TODOs comentados no codigo
   > OBS: Ainda existem TODOs, mas devem ficar para uma evolução futura
+- [] Melhorar estilização do menu humburguer (espaçamento a esquerda, botão sair) e possivelmente move os dados sobre uso de armazenamento para fora, talvez de uma forma mais resumida? ou priorizar sobre outro link/seletor de tema?
 
 ---
 
 ### Backend
 
+- [ ] Adicionar @PreAuthorize nos endpoints de Admin
 - [x] Corrigir TODOs comentados no codigo
   > OBS: Ainda existem TODOs, mas devem ficar para uma evolução futura

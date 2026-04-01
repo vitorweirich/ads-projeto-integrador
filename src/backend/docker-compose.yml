@@ -44,7 +44,8 @@ services:
       - "3902:3902"
       - "3903:3903"
     environment:
-      GARAGE_RPC_SECRET: "376ead8159bfada1e3317bf3e3ad945eff9184b7ea18d2ba0b46261241b243ad"
+      RUST_LOG: info
+      GARAGE_RPC_SECRET: 376ead8159bfada1e3317bf3e3ad945eff9184b7ea18d2ba0b46261241b243ad
     command: /garage -c /etc/garage.toml server
     volumes:
       - ./garage.toml:/etc/garage.toml:ro
@@ -60,7 +61,7 @@ services:
       garage:
         condition: service_healthy
     environment:
-      DOCKER_API_VERSION: "1.43"
+      DOCKER_API_VERSION: "1.41"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./scripts/garage-init.sh:/init.sh:ro
