@@ -42,6 +42,7 @@
 
 ### Backend
 
-- [ ] Adicionar @PreAuthorize nos endpoints de Admin
+- [x] Adicionar @PreAuthorize nos endpoints de Admin
+  > Já existe, nesse projeto o usuario é considerado administrador se o email esta na lista de emails de admin e não baseado em roles
 - [x] Corrigir TODOs comentados no codigo
   > OBS: Ainda existem TODOs, mas devem ficar para uma evolução futura

@@ -87,7 +87,8 @@ console.log(`Versão detectada no pom.xml: ${version}`);
 
 // Apenas para pegar o arquivo de env correto, o build ainda sera otimizado para produção
 const MODE = "production";
-const IMAGE_NAME = "registry.vitorweirich.com/file-share-backend";
+const REGISTRY = "localhost:5000";
+const IMAGE_NAME = `${REGISTRY}/file-share-backend`;
 const TAG = `${IMAGE_NAME}:${version}`;
 
 // Detecta flag --push

@@ -64,10 +64,7 @@ export default function FileViewScreen() {
       {playUrl && isVideo && (
         <Video
           source={{
-            uri: playUrl.replace(
-              "http://localhost:8080",
-              "http://10.0.2.2:8080",
-            ),
+            uri: playUrl,
           }}
           style={styles.player}
           useNativeControls
