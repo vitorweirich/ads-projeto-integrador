@@ -26,6 +26,13 @@ try {
     ...process.env,
     ANDROID_HOME: androidHome,
     PATH: `${androidHome}\\platform-tools;${androidHome}\\emulator;${process.env.PATH}`,
+    // Usado pra especificar uma versão mais recente do cmake
+    CMAKE_VERSION: "4.1.2",
+    EXPO_PUBLIC_API_URL:
+      process.env.EXPO_PUBLIC_API_URL ||
+      "https://native.files.vitorweirich.com",
+    EXPO_PUBLIC_WEB_URL:
+      process.env.EXPO_PUBLIC_WEB_URL || "https://files.vitorweirich.com",
   };
 
   // Gerar pasta android se necessário
