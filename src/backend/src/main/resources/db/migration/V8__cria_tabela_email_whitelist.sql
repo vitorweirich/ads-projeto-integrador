@@ -1,0 +1,9 @@
+CREATE TABLE EMAIL_WHITELIST (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+    invited_name VARCHAR(255),
+    invite_token VARCHAR(255),
+    invite_token_expires_at TIMESTAMP(6) WITH TIME ZONE,
+    created_at TIMESTAMP(6) WITH TIME ZONE
+);

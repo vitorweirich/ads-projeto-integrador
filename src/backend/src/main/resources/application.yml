@@ -66,7 +66,24 @@ app:
     base-url: ${MAGIC_LINK_BASE_URL:http://localhost:8080}
   reset-password:
     base-url: ${RESET_PASSWORD_BASE_URL:http://localhost:5173/reset-password}
+  invite:
+    base-url: ${INVITE_BASE_URL:http://localhost:5173/register}
+    expiration-hours: ${INVITE_EXPIRATION_HOURS:72}
+  whitelist:
+    enabled: ${WHITELIST_ENABLED:true}
   cookie:
     secure: ${COOKIE_SECURE:false} # PRD deve ser: "true"
     domain: ${COOKIE_DOMAIN:}
     sameSite: ${COOKIE_SAMESITE:Lax} # PRD deve ser: "None"
+
+management:
+  server:
+    port: 8081
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0

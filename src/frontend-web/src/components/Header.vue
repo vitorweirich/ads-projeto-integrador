@@ -180,6 +180,11 @@ const mobileLogout = () => {
                 >Administrar Usuários</router-link
               >
             </li>
+            <li>
+              <router-link to="/admin/whitelist" data-cy="admin-whitelist-link"
+                >Administrar Whitelist</router-link
+              >
+            </li>
           </template>
           <template v-if="isAuthenticated">
             <li><StorageQuota /></li>
@@ -255,6 +260,11 @@ const mobileLogout = () => {
               >Administrar Usuários</router-link
             >
           </li>
+          <li>
+            <router-link to="/admin/whitelist" @click="mobileMenuOpen = false"
+              >Administrar Whitelist</router-link
+            >
+          </li>
         </template>
         <template v-if="isAuthenticated">
           <li><StorageQuota /></li>
@@ -294,6 +304,11 @@ const mobileLogout = () => {
           <li>
             <router-link to="/admin/users" @click="mobileMenuOpen = false"
               >Administrar Usuários</router-link
+            >
+          </li>
+          <li>
+            <router-link to="/admin/whitelist" @click="mobileMenuOpen = false"
+              >Administrar Whitelist</router-link
             >
           </li>
         </template>

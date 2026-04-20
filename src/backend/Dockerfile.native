@@ -1,4 +1,4 @@
-FROM ghcr.io/graalvm/native-image-community:17 as build
+FROM ghcr.io/graalvm/native-image-community:17 AS build
 WORKDIR /app
 
 # Copia apenas os arquivos que raramente mudam

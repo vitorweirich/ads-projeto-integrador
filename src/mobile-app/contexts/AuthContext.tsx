@@ -207,11 +207,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       if (!res.ok) {
         let message = "Falha ao cadastrar. Tente novamente.";
+        let code: string | undefined;
         try {
           const err = await res.json();
-          message = JSON.stringify(err) || err?.message || message;
+          message = err?.message || message;
+          code = err?.code;
         } catch {}
-        throw new Error(message);
+        const error: any = new Error(message);
+        error.code = code;
+        throw error;
       }
     },
     [],

@@ -97,6 +97,12 @@ const router = createRouter({
       props: true,
     },
     {
+      path: '/admin/whitelist',
+      name: 'admin-whitelist',
+      component: () => import('../views/AdminWhitelistView.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
       path: '/:pathMatch(.*)*',
       name: 'NotFound',
       component: () => import('../views/NotFoundView.vue'),

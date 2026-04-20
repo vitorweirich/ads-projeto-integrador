@@ -1,10 +1,16 @@
 <script lang="ts" setup>
 import { useAuthStore } from '@/stores/auth'
+import { useLoadingStore } from '@/stores/loading'
+import { computed } from 'vue'
+import { storeToRefs } from 'pinia'
 
-const auth = useAuthStore()
+const { loading: authLoading } = storeToRefs(useAuthStore())
+const { loading: globalLoading } = storeToRefs(useLoadingStore())
+
+const loading = computed(() => authLoading.value || globalLoading.value)
 </script>
 <template>
-  <div v-if="auth.loading" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+  <div v-if="loading" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
     <div class="flex flex-row items-center text-xl">
       Carregando
       <div>

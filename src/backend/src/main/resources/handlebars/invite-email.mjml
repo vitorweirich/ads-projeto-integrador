@@ -1,0 +1,23 @@
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-text font-size="20px" color="#333333" font-family="Helvetica Neue"
+          >Você foi convidado!</mj-text
+        >
+        <mj-text font-size="16px" color="#555555">Olá, {{ name }}!</mj-text>
+        <mj-text font-size="16px" color="#555555"
+          >Seu acesso foi aprovado. Clique no botão abaixo para criar sua
+          conta:</mj-text
+        >
+        <mj-button background-color="#346DB7" color="white" href="{{inviteUrl}}"
+          >Criar minha conta</mj-button
+        >
+        <mj-text font-size="12px" color="#999999"
+          >Este link expira em {{ expirationHours }} horas. Se você não
+          solicitou acesso, ignore este e-mail.</mj-text
+        >
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

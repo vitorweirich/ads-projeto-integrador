@@ -1,16 +1,21 @@
 <script setup lang="ts">
 import { onMounted, ref, watch, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useLoadingStore } from '@/stores/loading'
 import api from '@/services/api'
 
 const auth = useAuthStore()
+const loadingStore = useLoadingStore()
 
 const router = useRouter()
+const route = useRoute()
+const inviteToken = ref((route.query.invite as string) || '')
 const name = ref('')
 const email = ref('')
 const password = ref('')
 const error = ref('')
+const isPending = ref(false)
 const isRegistered = ref(false)
 const isLoading = ref(false)
 
@@ -36,25 +41,46 @@ const handleRegister = async () => {
 
   isLoading.value = true
   try {
+    const params = inviteToken.value ? { invite: inviteToken.value } : {}
     await api.post('/v1/api/auth/register', {
       name: name.value,
       email: email.value,
       password: password.value,
-    })
+    }, { params })
     isRegistered.value = true
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
     console.error(err)
-    error.value = err?.response?.data?.message || 'Ocorreu um erro durante o cadastro'
+    const code = err?.response?.data?.code
+    if (code === 'PENDING_APPROVAL') {
+      isPending.value = true
+    } else {
+      error.value = err?.response?.data?.message || 'Ocorreu um erro durante o cadastro'
+    }
   } finally {
     isLoading.value = false
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   if (auth.isAuthenticated) {
     handlePostLoginRedirect()
+    return
+  }
+  if (inviteToken.value) {
+    loadingStore.show()
+    try {
+      const { data } = await api.get('/v1/api/auth/invite-info', {
+        params: { invite: inviteToken.value },
+      })
+      email.value = data.email || ''
+      if (data.invitedName) name.value = data.invitedName
+    } catch {
+      // token inválido/expirado — deixa o form normal
+    } finally {
+      loadingStore.hide()
+    }
   }
 })
 
@@ -73,12 +99,26 @@ watch(
     <div class="w-full max-w-md space-y-8">
       <div>
         <h2 class="mt-6 text-center text-3xl font-extrabold" data-cy="register-title">
-          {{ isRegistered ? 'Cadastro realizado com sucesso!' : 'Crie sua conta' }}
+          {{ isPending ? 'Aguardando aprovação' : isRegistered ? 'Cadastro realizado com sucesso!' : 'Crie sua conta' }}
         </h2>
       </div>
 
+      <div v-if="isPending" class="space-y-6 text-center">
+        <div class="rounded-md bg-yellow-50 p-4 dark:bg-yellow-900">
+          <p class="text-base text-yellow-800 dark:text-yellow-200">
+            Seu email está aguardando aprovação. Você será notificado quando for liberado.
+          </p>
+        </div>
+        <button
+          @click="router.push('/login')"
+          class="group relative flex w-full justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium focus:ring-blue-500 focus:ring-offset-2 focus:outline-none hover:focus:ring-2"
+        >
+          Voltar para o Login
+        </button>
+      </div>
+
       <!-- Success message section -->
-      <div v-if="isRegistered" class="space-y-6 text-center" data-cy="register-success-message">
+      <div v-else-if="isRegistered" class="space-y-6 text-center" data-cy="register-success-message">
         <div class="rounded-md p-4">
           <p class="text-base">
             Enviamos um e-mail de confirmação para
@@ -125,7 +165,9 @@ watch(
               type="email"
               required
               v-model="email"
+              :readonly="!!inviteToken"
               class="relative block w-full appearance-none rounded-none border border-gray-300 px-3 py-2 placeholder-gray-500 focus:z-10 focus:border-blue-500 focus:ring-blue-500 focus:outline-none sm:text-sm"
+              :class="{ 'cursor-not-allowed opacity-70': !!inviteToken }"
               placeholder="E-mail"
               data-cy="input-email"
             />

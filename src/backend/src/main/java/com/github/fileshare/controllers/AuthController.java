@@ -23,11 +23,13 @@ import com.github.fileshare.dto.response.MessageResponse;
 import com.github.fileshare.dto.response.MfaJwtResponse;
 import com.github.fileshare.dto.response.TokenResponse;
 import com.github.fileshare.dto.response.UserInfoDTO;
+import com.github.fileshare.dto.response.WhitelistEntryDTO;
 import com.github.fileshare.services.AuthService;
 import com.github.fileshare.services.MagicLinkService;
 import com.github.fileshare.services.MfaService;
 import com.github.fileshare.services.RefreshTokenService;
 import com.github.fileshare.services.UserService;
+import com.github.fileshare.services.WhitelistService;
 import com.github.fileshare.utils.AuthorizationUtils;
 
 import jakarta.mail.MessagingException;
@@ -46,6 +48,7 @@ public class AuthController {
     private final MfaService mfaService;
     private final AuthService authService;
     private final UserService userService;
+    private final WhitelistService whitelistService;
     
     @PostMapping("/forgot-password")
     public ResponseEntity<Void> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
@@ -144,9 +147,15 @@ public class AuthController {
         return AuthorizationUtils.buildTokenResponse(request, tokenResponse);
     }
 
+    @GetMapping("/invite-info")
+    public ResponseEntity<WhitelistEntryDTO> getInviteInfo(@RequestParam String invite) {
+        return ResponseEntity.ok(whitelistService.getInviteInfo(invite));
+    }
+
     @PostMapping("/register")
-    public ResponseEntity<MessageResponse> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
-        this.authService.registerTemporaryUser(signUpRequest);
+    public ResponseEntity<MessageResponse> registerUser(@Valid @RequestBody SignupRequest signUpRequest,
+            @RequestParam(required = false) String invite) {
+        this.authService.registerTemporaryUser(signUpRequest, invite);
         
         return ResponseEntity.ok(new MessageResponse("Cadastro iniciado! Confirme seu e-mail."));
     }

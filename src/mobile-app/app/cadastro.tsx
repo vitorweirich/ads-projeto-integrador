@@ -19,6 +19,7 @@ export default function CadastroScreen() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
+  const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState("");
 
   const hasMinLength = useMemo(() => password.length >= 6, [password]);
@@ -49,11 +50,38 @@ export default function CadastroScreen() {
       await register(name, email, password);
       setIsRegistered(true);
     } catch (e: any) {
-      setError(e?.message || "Ocorreu um erro durante o cadastro");
+      if (e?.code === "PENDING_APPROVAL") {
+        setIsPending(true);
+      } else {
+        setError(e?.message || "Ocorreu um erro durante o cadastro");
+      }
     } finally {
       setLoading(false);
     }
   };
+
+  if (isPending) {
+    return (
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.successContainer}
+      >
+        <Text style={styles.title}>Aguardando aprovação</Text>
+        <View style={[styles.successBox, { borderColor: "#F39C12" }]}>
+          <Text style={styles.successText}>
+            Seu email está aguardando aprovação. Você será notificado quando for
+            liberado.
+          </Text>
+        </View>
+        <Pressable
+          onPress={() => router.replace("/login")}
+          style={styles.button}
+        >
+          <Text style={styles.buttonText}>Voltar para o Login</Text>
+        </Pressable>
+      </ScrollView>
+    );
+  }
 
   if (isRegistered) {
     return (

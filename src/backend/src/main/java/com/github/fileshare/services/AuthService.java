@@ -17,9 +17,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import com.github.fileshare.config.StorageProperties;
+import com.github.fileshare.config.admin.AdminConfigProperties;
+import com.github.fileshare.config.entities.EmailWhitelistEntity.Status;
 import com.github.fileshare.config.entities.PasswordResetTokenEntity;
 import com.github.fileshare.config.entities.RefreshTokenEntity;
 import com.github.fileshare.config.entities.SessionTransferTokenEntity;
@@ -35,10 +38,12 @@ import com.github.fileshare.dto.response.SessionTransferResponse;
 import com.github.fileshare.dto.response.TokenResponse;
 import com.github.fileshare.exceptions.AuthenticationException;
 import com.github.fileshare.exceptions.MessageFeedbackException;
+import com.github.fileshare.exceptions.PendingApprovalException;
 import com.github.fileshare.respositories.PasswordResetTokenRepository;
 import com.github.fileshare.respositories.SessionTransferTokenRepository;
 import com.github.fileshare.respositories.TemporaryUserRepository;
 import com.github.fileshare.respositories.UserSettingsRepository;
+import com.github.fileshare.respositories.EmailWhitelistRepository;
 import com.github.fileshare.security.JwtUtils;
 import com.github.fileshare.utils.AuthenticatedUserUtils;
 import com.github.fileshare.utils.AuthorizationUtils;
@@ -48,9 +53,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthService {
 	
 	private final AuthenticationManager authenticationManager;
@@ -65,6 +72,9 @@ public class AuthService {
 	private final PasswordResetTokenRepository passwordResetTokenRepository;
 	private final RefreshTokenService refreshTokenService;
 	private final SessionTransferTokenRepository sessionTransferTokenRepository;
+	private final WhitelistService whitelistService;
+	private final EmailWhitelistRepository whitelistRepository;
+	private final AdminConfigProperties adminConfigProperties;
 	
 	private static final Duration RESET_PASSWORD_TOKEN_VALIDITY = Duration.ofMinutes(30);
 	
@@ -74,6 +84,8 @@ public class AuthService {
     private long expirationMinutes;
     @Value("${app.reset-password.base-url:http://localhost:8080/v1/api/auth/reset-password}")
     private String resetPasswordBaseUrl;
+    @Value("${app.whitelist.enabled:true}")
+    private boolean whitelistEnabled;
     
     public ResponseEntity<?> authenticateUser(LoginRequest loginRequest,
             HttpServletResponse response,
@@ -129,7 +141,19 @@ public class AuthService {
     }
 	
     @Transactional
-	public void registerTemporaryUser(SignupRequest signUpRequest) {
+	public void registerTemporaryUser(SignupRequest signUpRequest, String invite) {
+    	if (StringUtils.hasLength(invite)) {
+    		whitelistService.consumeInviteToken(invite);
+        } else if (whitelistEnabled && !adminConfigProperties.getAdminEmails().contains(signUpRequest.getEmail())) {
+        	Status whitelistStatus = whitelistService.checkEmailStatus(signUpRequest.getEmail());
+            if (whitelistStatus == null) {
+                whitelistService.registerPendingEmail(signUpRequest.getEmail(), signUpRequest.getName());
+                throw new PendingApprovalException("Seu email está aguardando aprovação. Você será notificado quando for liberado.");
+            } else if(whitelistStatus.equals(Status.PENDING)) {
+            	throw new PendingApprovalException("Seu email está aguardando aprovação. Você será notificado quando for liberado.");
+            }
+        }
+
         var usuarioTempOpt = temporaryUserRepository.findByEmail(signUpRequest.getEmail());
         boolean emailDefinitivo = userService.existsByEmail(signUpRequest.getEmail());
         boolean emailTemporario = usuarioTempOpt.isPresent();
@@ -165,7 +189,7 @@ public class AuthService {
         try {
             emailService.sendHtmlEmailFromTemplate(signUpRequest.getEmail(), "Confirme seu cadastro", "magic-link-confirmation", variables);
         } catch (MessagingException | IOException e) {
-            e.printStackTrace();
+            log.error("AuthService.registerTemporaryUser - error sending confirmation email - email [{}]", signUpRequest.getEmail(), e);
             throw new MessageFeedbackException("Falha ao enviar email de confirmação");
         }
     }
@@ -200,6 +224,7 @@ public class AuthService {
         userSettingsRepository.save(userSettings);
         
         temporaryUserRepository.delete(usuarioTemp);
+        whitelistRepository.findByEmail(user.getEmail()).ifPresent(whitelistRepository::delete);
     }
 	
 	private boolean isTemporaryUserExpired(TemporaryUserEntity usuarioTemp) {

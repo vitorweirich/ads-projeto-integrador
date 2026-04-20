@@ -85,6 +85,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 				.body(new ErrorResponse("AUTHENTICATION_ERROR", ex.getMessage()));
 	}
 
+	@ExceptionHandler(PendingApprovalException.class)
+	public ResponseEntity<ErrorResponse> handlePendingApprovalException(PendingApprovalException ex) {
+		return ResponseEntity.status(HttpStatus.FORBIDDEN)
+				.body(new ErrorResponse("PENDING_APPROVAL", ex.getMessage()));
+	}
+
 	@ExceptionHandler(IllegalArgumentException.class)
 	public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex) {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST)

@@ -103,7 +103,7 @@ console.log(`📦 Buildando Docker image: ${TAG} com MODE=${MODE}...`);
 
 try {
   execSync(
-    `docker build -f Dockerfile.native --build-arg MODE=${MODE} -t ${TAG} -t ${IMAGE_NAME}:latest .`,
+    `wsl docker build -f Dockerfile.native --build-arg MODE=${MODE} -t ${TAG} -t ${IMAGE_NAME}:latest .`,
     {
       stdio: "inherit",
     },
@@ -113,8 +113,8 @@ try {
   if (PUSH) {
     try {
       console.log("⬆️  Pushando imagens para o registry...");
-      execSync(`docker push ${TAG}`, { stdio: "inherit" });
-      execSync(`docker push ${IMAGE_NAME}:latest`, { stdio: "inherit" });
+      execSync(`wsl docker push ${TAG}`, { stdio: "inherit" });
+      execSync(`wsl docker push ${IMAGE_NAME}:latest`, { stdio: "inherit" });
       console.log("✅ Imagens pushadas com sucesso.");
     } catch (errPush) {
       console.error("❌ Erro ao pushar as imagens:", errPush);
