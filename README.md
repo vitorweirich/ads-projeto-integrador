@@ -57,3 +57,6 @@ TODO
 ### Backend
 
 TODO
+
+### Testes automatizados (cypress)
+Link de apresentação dos testes automatizados com cypress: https://www.youtube.com/watch?v=XLV8zDDAS74
