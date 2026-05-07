@@ -9,6 +9,10 @@ public class PublicPaths {
 
 	public static final RequestMatcher[] PUBLIC_PATHS_MATCHERS = new RequestMatcher[] {
 			PathPatternRequestMatcher.withDefaults().matcher("/v1/share-url/{shortUrl}"),
-			PathPatternRequestMatcher.withDefaults().matcher("/health")
+			PathPatternRequestMatcher.withDefaults().matcher("/health"),
+			PathPatternRequestMatcher.withDefaults().matcher("/swagger-ui/**"),
+			PathPatternRequestMatcher.withDefaults().matcher("/swagger/**"),
+			PathPatternRequestMatcher.withDefaults().matcher("/v3/api-docs/**"),
+			PathPatternRequestMatcher.withDefaults().matcher("/openapi/**")
 	};
 }

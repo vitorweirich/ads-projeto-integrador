@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>API Docs</title>
+
+    <!-- Baixados de https://github.com/swagger-api/swagger-ui/releases (/dist) -->
+    <link rel="stylesheet" href="./swagger-ui.css" />
+    <link
+      rel="icon"
+      type="image/png"
+      href="./favicon-32x32.png"
+      sizes="32x32"
+    />
+  </head>
+
+  <body>
+    <div id="swagger-ui"></div>
+
+    <!-- Baixados de https://github.com/swagger-api/swagger-ui/releases (/dist) -->
+    <script src="./swagger-ui-bundle.js"></script>
+    <script src="./swagger-ui-standalone-preset.js"></script>
+
+    <script>
+      window.onload = () => {
+        SwaggerUIBundle({
+          url: "/swagger/openapi.yaml",
+          dom_id: "#swagger-ui",
+          deepLinking: true,
+          presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
+          layout: "StandaloneLayout",
+        });
+      };
+    </script>
+  </body>
+</html>

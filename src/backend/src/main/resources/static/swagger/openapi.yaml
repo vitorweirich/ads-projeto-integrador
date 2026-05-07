@@ -1,0 +1,972 @@
+openapi: 3.1.0
+info:
+  title: File Share
+  version: v1
+servers:
+  - url: http://localhost:8080
+    description: Generated server url
+security:
+  - bearerAuth: []
+paths:
+  /v1/files/upload:
+    post:
+      tags:
+        - file-controller
+      operationId: requestSignedUrlToPostFile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestPostFileDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/SignedUrlDTO"
+  /v1/api/auth/session-transfer:
+    post:
+      tags:
+        - session-transfer-controller
+      operationId: generateSessionTransferToken
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SessionTransferRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/SessionTransferResponse"
+  /v1/api/auth/session-exchange:
+    post:
+      tags:
+        - session-transfer-controller
+      operationId: exchangeSession
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SessionExchangeRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: object
+  /v1/api/auth/reset-password:
+    post:
+      tags:
+        - auth-controller
+      operationId: resetPassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResetPasswordRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+  /v1/api/auth/register:
+    post:
+      tags:
+        - auth-controller
+      operationId: registerUser
+      parameters:
+        - name: invite
+          in: query
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignupRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+  /v1/api/auth/refresh:
+    post:
+      tags:
+        - auth-controller
+      operationId: refresh
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+  /v1/api/auth/mfa/verify:
+    post:
+      tags:
+        - auth-controller
+      operationId: verifyMfa
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: code
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+  /v1/api/auth/mfa/setup:
+    post:
+      tags:
+        - auth-controller
+      operationId: setupMfa
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            image/svg+xml:
+              schema:
+                type: string
+                format: byte
+  /v1/api/auth/mfa/setup/initiate:
+    post:
+      tags:
+        - auth-controller
+      operationId: startSetupMfa
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MfaJwtResponse"
+  /v1/api/auth/mfa/confirm:
+    post:
+      tags:
+        - auth-controller
+      operationId: confirmMfaSetup
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: code
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+  /v1/api/auth/logout:
+    post:
+      tags:
+        - auth-controller
+      operationId: logout
+      responses:
+        "200":
+          description: OK
+  /v1/api/auth/login:
+    post:
+      tags:
+        - auth-controller
+      operationId: authenticateUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: object
+  /v1/api/auth/login/generate-magic-link:
+    post:
+      tags:
+        - auth-controller
+      operationId: generateMagicLink
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MagicLoginRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+  /v1/api/auth/forgot-password:
+    post:
+      tags:
+        - auth-controller
+      operationId: forgotPassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ForgotPasswordRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+  /v1/admin/whitelist/{id}/approve:
+    post:
+      tags:
+        - admin-controller
+      operationId: approveWhitelist
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: OK
+  /v1/admin/whitelist/invite:
+    post:
+      tags:
+        - admin-controller
+      operationId: inviteEmail
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InviteRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+  /v1/admin/users/{userId}/reset-mfa:
+    post:
+      tags:
+        - admin-controller
+      operationId: resetUserMfa
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: OK
+  /v1/files/upload/{fileId}/register-uploaded:
+    patch:
+      tags:
+        - file-controller
+      operationId: setFileUploaded
+      parameters:
+        - name: fileId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: OK
+  /v1/share-url/{shortUrl}:
+    get:
+      tags:
+        - short-link-controller
+      operationId: redirect
+      parameters:
+        - name: shortUrl
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: jsonResponse
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: object
+  /v1/files/{fileId}:
+    get:
+      tags:
+        - file-controller
+      operationId: requestSignedUrlToGetFile
+      parameters:
+        - name: fileId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/SignedUrlDTO"
+    delete:
+      tags:
+        - file-controller
+      operationId: deleteFile
+      parameters:
+        - name: fileId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/SignedUrlDTO"
+  /v1/files/me:
+    get:
+      tags:
+        - file-controller
+      operationId: listFiles
+      parameters:
+        - name: params
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/ListFilesRequestParams"
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/PageFileDTO"
+  /v1/api/auth/me:
+    get:
+      tags:
+        - auth-controller
+      operationId: me
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/UserInfoDTO"
+  /v1/api/auth/login/magic-link:
+    get:
+      tags:
+        - auth-controller
+      operationId: authenticateUserWithMagicLink
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+  /v1/api/auth/invite-info:
+    get:
+      tags:
+        - auth-controller
+      operationId: getInviteInfo
+      parameters:
+        - name: invite
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/WhitelistEntryDTO"
+  /v1/api/auth/confirm/{token}:
+    get:
+      tags:
+        - auth-controller
+      operationId: confirmEmail
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+  /v1/admin/whitelist/pending:
+    get:
+      tags:
+        - admin-controller
+      operationId: listPendingWhitelist
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 0
+        - name: rows
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 20
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/PageWhitelistEntryDTO"
+  /v1/admin/users:
+    get:
+      tags:
+        - admin-controller
+      operationId: listUsers
+      parameters:
+        - name: params
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/ListUsersRequestParams"
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/PageCompleteUserDTO"
+  /v1/admin/files:
+    get:
+      tags:
+        - admin-controller
+      operationId: listFiles_1
+      parameters:
+        - name: params
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/ListFilesRequestParams"
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/PageFileDTO"
+  /v1/admin/files/{fileId}:
+    get:
+      tags:
+        - admin-controller
+      operationId: getFile
+      parameters:
+        - name: fileId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/AdminFileSignedUrl"
+    delete:
+      tags:
+        - admin-controller
+      operationId: deleteFile_1
+      parameters:
+        - name: fileId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: OK
+  /health:
+    get:
+      tags:
+        - health-check-controller
+      operationId: health
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                type: object
+  /v1/api/auth/account:
+    delete:
+      tags:
+        - auth-controller
+      operationId: deleteAccount
+      responses:
+        "200":
+          description: OK
+          content:
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+components:
+  schemas:
+    RequestPostFileDTO:
+      type: object
+      properties:
+        fileName:
+          type: string
+          minLength: 1
+          pattern: "^[^\\/:*?\"<>|.]{1,70}$"
+        contentType:
+          type: string
+          minLength: 1
+        fileSize:
+          type: integer
+          format: int64
+      required:
+        - fileSize
+    SignedUrlDTO:
+      type: object
+      properties:
+        signedUrl:
+          type: string
+        metadata:
+          type: object
+          additionalProperties:
+            type: object
+        fileId:
+          type: integer
+          format: int64
+        expirationDate:
+          type: string
+          format: date-time
+    SessionTransferRequest:
+      type: object
+      properties:
+        target:
+          type: string
+          minLength: 1
+          pattern: WEB|MOBILE
+    SessionTransferResponse:
+      type: object
+      properties:
+        transferToken:
+          type: string
+    SessionExchangeRequest:
+      type: object
+      properties:
+        token:
+          type: string
+    ResetPasswordRequest:
+      type: object
+      properties:
+        token:
+          type: string
+          minLength: 1
+        newPassword:
+          type: string
+          maxLength: 40
+          minLength: 6
+    SignupRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 100
+          minLength: 0
+        email:
+          type: string
+          maxLength: 100
+          minLength: 0
+        password:
+          type: string
+          maxLength: 40
+          minLength: 6
+    MessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+    TokenResponse:
+      type: object
+      properties:
+        refreshToken:
+          type: string
+        accessToken:
+          type: string
+    MfaJwtResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        type:
+          type: string
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          maxLength: 100
+          minLength: 0
+        password:
+          type: string
+          maxLength: 40
+          minLength: 6
+    MagicLoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          maxLength: 100
+          minLength: 0
+    ForgotPasswordRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          maxLength: 100
+          minLength: 0
+    InviteRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          minLength: 1
+        name:
+          type: string
+    ListFilesRequestParams:
+      type: object
+      properties:
+        page:
+          type: integer
+          format: int32
+        rows:
+          type: integer
+          format: int32
+          maximum: 100
+          minimum: 1
+        sort:
+          type: string
+          pattern: asc|desc|ASC|DESC
+        uploaded:
+          type: boolean
+    FileDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        size:
+          type: integer
+          format: int64
+        uploaded:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        shareUrl:
+          type: string
+        expiresIn:
+          type: string
+          format: date-time
+        contentType:
+          type: string
+    PageFileDTO:
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/FileDTO"
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: "#/components/schemas/SortObject"
+        first:
+          type: boolean
+        last:
+          type: boolean
+        numberOfElements:
+          type: integer
+          format: int32
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
+        empty:
+          type: boolean
+    PageableObject:
+      type: object
+      properties:
+        offset:
+          type: integer
+          format: int64
+        sort:
+          $ref: "#/components/schemas/SortObject"
+        pageNumber:
+          type: integer
+          format: int32
+        paged:
+          type: boolean
+        pageSize:
+          type: integer
+          format: int32
+        unpaged:
+          type: boolean
+    SortObject:
+      type: object
+      properties:
+        empty:
+          type: boolean
+        unsorted:
+          type: boolean
+        sorted:
+          type: boolean
+    StorageDetails:
+      type: object
+      properties:
+        totalQuota:
+          type: integer
+          format: int64
+        usedQuota:
+          type: integer
+          format: int64
+    UserInfoDTO:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        mfaEnabled:
+          type: boolean
+        hasAdminPrivileges:
+          type: boolean
+        storage:
+          $ref: "#/components/schemas/StorageDetails"
+    WhitelistEntryDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        email:
+          type: string
+        invitedName:
+          type: string
+        status:
+          type: string
+          enum:
+            - ALLOWED
+            - PENDING
+        createdAt:
+          type: string
+          format: date-time
+    PageWhitelistEntryDTO:
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/WhitelistEntryDTO"
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: "#/components/schemas/SortObject"
+        first:
+          type: boolean
+        last:
+          type: boolean
+        numberOfElements:
+          type: integer
+          format: int32
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
+        empty:
+          type: boolean
+    ListUsersRequestParams:
+      type: object
+      properties:
+        page:
+          type: integer
+          format: int32
+        rows:
+          type: integer
+          format: int32
+          maximum: 100
+          minimum: 1
+        sort:
+          type: string
+          pattern: asc|desc|ASC|DESC
+    CompleteUserDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+        mfaSecret:
+          type: string
+        mfaEnabled:
+          type: boolean
+        totalSize:
+          type: integer
+          format: int64
+        createdAt:
+          type: string
+          format: date-time
+        settings:
+          $ref: "#/components/schemas/UserSettingsProjection"
+    PageCompleteUserDTO:
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/CompleteUserDTO"
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: "#/components/schemas/SortObject"
+        first:
+          type: boolean
+        last:
+          type: boolean
+        numberOfElements:
+          type: integer
+          format: int32
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
+        empty:
+          type: boolean
+    UserSettingsProjection:
+      type: object
+      properties:
+        storageLimitBytes:
+          type: integer
+          format: int64
+        maxFileRetentionDays:
+          type: integer
+          format: int32
+        modifiedAt:
+          type: string
+          format: date-time
+    AdminFileSignedUrl:
+      type: object
+      properties:
+        signedUrl:
+          type: string
+        timestamps:
+          $ref: "#/components/schemas/UrlTimestamps"
+    UrlTimestamps:
+      type: object
+      properties:
+        creationTime:
+          type: string
+          format: date-time
+        expirationTime:
+          type: string
+          format: date-time
+  securitySchemes:
+    bearerAuth:
+      type: http
+      description: JWT Authorization header usando Bearer token
+      in: header
+      scheme: bearer
+      bearerFormat: JWT
