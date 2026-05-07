@@ -77,7 +77,7 @@ const mobileLogout = () => {
       <div class="hidden items-center gap-4 md:flex xl:hidden">
         <nav>
           <ul class="flex items-center space-x-5">
-            <li><ThemeSelector /></li>
+            <li><ThemeSelector data-cy="theme-selector"/></li>
             <template v-if="isAuthenticated">
               <li>
                 <router-link to="/list-files" data-cy="my-files-link">Meus Arquivos</router-link>

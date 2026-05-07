@@ -5,31 +5,31 @@ describe('Header Navigation', () => {
 
   context('Usuário não autenticado', () => {
     it('deve exibir links de login e cadastro', () => {
-      cy.get('[data-cy="home-link"]').should('exist')
-      cy.get('[data-cy="login-link"]').should('exist')
-      cy.get('[data-cy="register-link"]').should('exist')
-      cy.get('[data-cy="theme-selector"]').should('exist')
+      cy.get('[data-cy="home-link"]:visible').should('exist')
+      cy.get('[data-cy="login-link"]:visible').should('exist')
+      cy.get('[data-cy="register-link"]:visible').should('exist')
+      cy.get('[data-cy="theme-selector"]:visible').should('exist')
 
-      cy.get('[data-cy="my-files-link"]').should('not.exist')
-      cy.get('[data-cy="upload-file-link"]').should('not.exist')
-      cy.get('[data-cy="profile-button"]').should('not.exist')
+      cy.get('[data-cy="my-files-link"]:visible').should('not.exist')
+      cy.get('[data-cy="upload-file-link"]:visible').should('not.exist')
+      cy.get('[data-cy="profile-button"]:visible').should('not.exist')
     })
 
     it('clicar no link de login redireciona para a página de login', () => {
-      cy.get('[data-cy="login-link"]').click()
+      cy.get('[data-cy="login-link"]:visible').click()
       cy.url().should('include', '/login')
     })
 
     it('clicar no link de cadastro redireciona para a página de registro', () => {
-      cy.get('[data-cy="register-link"]').click()
+      cy.get('[data-cy="register-link"]:visible').click()
       cy.url().should('include', '/register')
     })
 
     it('clicar no botão theme-selector alterna a classe dark no html', () => {
       cy.get('html').should('have.class', 'dark')
-      cy.get('[data-cy="theme-selector"]').click()
+      cy.get('[data-cy="theme-selector"]:visible').click()
       cy.get('html').should('not.have.class', 'dark')
-      cy.get('[data-cy="theme-selector"]').click()
+      cy.get('[data-cy="theme-selector"]:visible').click()
       cy.get('html').should('have.class', 'dark')
     })
   })
@@ -47,30 +47,30 @@ describe('Header Navigation', () => {
     })
 
     it('deve exibir links de usuário autenticado', () => {
-      cy.get('[data-cy="my-files-link"]').should('exist')
-      cy.get('[data-cy="upload-file-link"]').should('exist')
-      cy.get('[data-cy="profile-button"]').contains('Olá, Teste!')
-      cy.get('[data-cy="admin-files-link"]').should('not.exist')
+      cy.get('[data-cy="my-files-link"]:visible').should('exist')
+      cy.get('[data-cy="upload-file-link"]:visible').should('exist')
+      cy.get('[data-cy="profile-button"]:visible').contains('Olá, Teste!')
+      cy.get('[data-cy="admin-files-link"]:visible').should('not.exist')
 
-      cy.get('[data-cy="admin-files-link"]').should('not.exist')
-      cy.get('[data-cy="admin-users-link"]').should('not.exist')
+      cy.get('[data-cy="admin-files-link"]:visible').should('not.exist')
+      cy.get('[data-cy="admin-users-link"]:visible').should('not.exist')
     })
 
-    it.skip('deve abrir o dropdown de perfil e fazer logout', () => {
-      cy.get('[data-cy="profile-button"]').click()
+    it('deve abrir o dropdown de perfil e fazer logout', () => {
+      cy.get('[data-cy="profile-button"]:visible').click()
       cy.get('[data-cy="profile-dropdown"]').should('exist')
-      cy.get('[data-cy="profile-link"]').should('exist')
-      cy.get('[data-cy="logout-button"]').click()
+      cy.get('[data-cy="profile-link"]:visible').should('exist')
+      cy.get('[data-cy="logout-button"]:visible').click()
 
-      cy.get('[data-cy="login-link"]').should('exist')
+      cy.get('[data-cy="login-link"]:visible').should('exist')
     })
 
     it('deve abrir o dropdown de perfil e navegar para perfil', () => {
-      cy.get('[data-cy="profile-button"]').click()
+      cy.get('[data-cy="profile-button"]:visible').click()
       cy.get('[data-cy="profile-dropdown"]').should('exist').should('be.visible')
-      cy.get('[data-cy="profile-link"]').should('be.visible')
+      cy.get('[data-cy="profile-link"]:visible').should('be.visible')
       cy.wait(500)
-      cy.get('[data-cy="profile-link"]').should('exist').should('be.visible').click()
+      cy.get('[data-cy="profile-link"]:visible').should('exist').should('be.visible').click()
 
       cy.url().should('include', '/profile')
     })
@@ -83,11 +83,11 @@ describe('Header Navigation', () => {
 
       cy.loginUser({ email, password: 'ABC@123' })
 
-      cy.get('[data-cy="profile-button"]').click()
+      cy.get('[data-cy="profile-button"]:visible').click()
       cy.get('[data-cy="profile-dropdown"]').should('exist').should('be.visible')
-      cy.get('[data-cy="profile-link"]').should('be.visible')
+      cy.get('[data-cy="profile-link"]:visible').should('be.visible')
       cy.wait(500)
-      cy.get('[data-cy="profile-link"]').should('exist').should('be.visible').click()
+      cy.get('[data-cy="profile-link"]:visible').should('exist').should('be.visible').click()
 
       cy.url().should('include', '/profile')
 
@@ -109,12 +109,12 @@ describe('Header Navigation', () => {
 
         cy.get('[data-cy=close-mfa-modal-button]').click()
 
-        cy.get('[data-cy="profile-button"]').click()
+        cy.get('[data-cy="profile-button"]:visible').click()
         cy.get('[data-cy="profile-dropdown"]').should('exist')
-        cy.get('[data-cy="profile-link"]').should('exist')
-        cy.get('[data-cy="logout-button"]').click()
+        cy.get('[data-cy="profile-link"]:visible').should('exist')
+        cy.get('[data-cy="logout-button"]:visible').click()
 
-        cy.get('[data-cy="login-link"]').should('exist')
+        cy.get('[data-cy="login-link"]:visible').should('exist')
       })
     })
 
@@ -124,17 +124,17 @@ describe('Header Navigation', () => {
     })
 
     it('deve exibir links de admin', () => {
-      cy.get('[data-cy="admin-files-link"]').should('exist')
-      cy.get('[data-cy="admin-users-link"]').should('exist')
+      cy.get('[data-cy="admin-files-link"]:visible').should('exist')
+      cy.get('[data-cy="admin-users-link"]:visible').should('exist')
     })
 
     it('clicar no link de administrar arquivos redireciona para a página de administrar arquivos', () => {
-      cy.get('[data-cy="admin-files-link"]').click()
+      cy.get('[data-cy="admin-files-link"]:visible').click()
       cy.url().should('include', '/admin/files')
     })
 
     it('clicar no link de administrar usuarios redireciona para a página de administrar usuarios', () => {
-      cy.get('[data-cy="admin-users-link"]').click()
+      cy.get('[data-cy="admin-users-link"]:visible').click()
       cy.url().should('include', '/admin/users')
     })
   })

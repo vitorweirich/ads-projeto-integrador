@@ -7,6 +7,8 @@ import { authenticator } from 'otplib'
 export default defineConfig({
   video: true,
   e2e: {
+    viewportWidth: 1920,
+    viewportHeight: 1080,
     baseUrl: 'http://localhost:5173',
     setupNodeEvents(on) {
       // implement node event listeners here
