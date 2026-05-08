@@ -1,299 +1,75 @@
 openapi: 3.1.0
 info:
-  title: File Share
+  title: File Share API
   version: v1
+  description: |
+    API para gerenciamento de arquivos com autenticação JWT.
+
+    ## Autenticação
+    A maioria dos endpoints (o que tiverem um cadeado) requer um token JWT no header `Authorization: Bearer <token>`.
+    Obtenha o token via `/v1/api/auth/login` ou `/v1/api/auth/login/magic-link`.
+
+    Endpoints de MFA intermediários usam um token temporário (`mfaAuth`) retornado
+    em `/v1/api/auth/mfa/setup/initiate` ou no login quando MFA está habilitado.
+
+    ## Tokens via Cookie
+    Por padrão, os tokens são trafegados como cookies HttpOnly. Para receber os tokens
+    no body JSON, envie o header `X-Http-Only: false`.
+
 servers:
   - url: http://localhost:8080
-    description: Generated server url
+    description: Desenvolvimento local
+
 security:
   - bearerAuth: []
+
+tags:
+  - name: auth-controller
+    description: Autenticação, registro e gerenciamento de conta
+  - name: file-controller
+    description: Upload, download e gerenciamento de arquivos
+  - name: admin-controller
+    description: Operações administrativas (requer role ADMIN)
+  - name: session-transfer-controller
+    description: Transferência de sessão entre plataformas (web/mobile)
+  - name: short-link-controller
+    description: Redirecionamento de links curtos de compartilhamento
+  - name: health-check-controller
+    description: Verificação de saúde da aplicação
+
 paths:
   /v1/files/upload:
     post:
-      tags:
-        - file-controller
+      tags: [file-controller]
+      summary: Solicitar URL assinada para upload
       operationId: requestSignedUrlToPostFile
+      security:
+        - bearerAuth: []
       requestBody:
+        required: true
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/RequestPostFileDTO"
-        required: true
       responses:
         "200":
-          description: OK
+          description: URL assinada gerada com sucesso
           content:
-            "*/*":
+            application/json:
               schema:
                 $ref: "#/components/schemas/SignedUrlDTO"
-  /v1/api/auth/session-transfer:
-    post:
-      tags:
-        - session-transfer-controller
-      operationId: generateSessionTransferToken
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/SessionTransferRequest"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            "*/*":
-              schema:
-                $ref: "#/components/schemas/SessionTransferResponse"
-  /v1/api/auth/session-exchange:
-    post:
-      tags:
-        - session-transfer-controller
-      operationId: exchangeSession
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/SessionExchangeRequest"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            "*/*":
-              schema:
-                type: object
-  /v1/api/auth/reset-password:
-    post:
-      tags:
-        - auth-controller
-      operationId: resetPassword
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ResetPasswordRequest"
-        required: true
-      responses:
-        "200":
-          description: OK
-  /v1/api/auth/register:
-    post:
-      tags:
-        - auth-controller
-      operationId: registerUser
-      parameters:
-        - name: invite
-          in: query
-          required: false
-          schema:
-            type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/SignupRequest"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            "*/*":
-              schema:
-                $ref: "#/components/schemas/MessageResponse"
-  /v1/api/auth/refresh:
-    post:
-      tags:
-        - auth-controller
-      operationId: refresh
-      responses:
-        "200":
-          description: OK
-          content:
-            "*/*":
-              schema:
-                $ref: "#/components/schemas/TokenResponse"
-  /v1/api/auth/mfa/verify:
-    post:
-      tags:
-        - auth-controller
-      operationId: verifyMfa
-      parameters:
-        - name: Authorization
-          in: header
-          required: true
-          schema:
-            type: string
-        - name: code
-          in: query
-          required: true
-          schema:
-            type: integer
-            format: int32
-      responses:
-        "200":
-          description: OK
-          content:
-            "*/*":
-              schema:
-                $ref: "#/components/schemas/TokenResponse"
-  /v1/api/auth/mfa/setup:
-    post:
-      tags:
-        - auth-controller
-      operationId: setupMfa
-      parameters:
-        - name: Authorization
-          in: header
-          required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            image/svg+xml:
-              schema:
-                type: string
-                format: byte
-  /v1/api/auth/mfa/setup/initiate:
-    post:
-      tags:
-        - auth-controller
-      operationId: startSetupMfa
-      responses:
-        "200":
-          description: OK
-          content:
-            "*/*":
-              schema:
-                $ref: "#/components/schemas/MfaJwtResponse"
-  /v1/api/auth/mfa/confirm:
-    post:
-      tags:
-        - auth-controller
-      operationId: confirmMfaSetup
-      parameters:
-        - name: Authorization
-          in: header
-          required: true
-          schema:
-            type: string
-        - name: code
-          in: query
-          required: true
-          schema:
-            type: integer
-            format: int32
-      responses:
-        "200":
-          description: OK
-          content:
-            "*/*":
-              schema:
-                $ref: "#/components/schemas/MessageResponse"
-  /v1/api/auth/logout:
-    post:
-      tags:
-        - auth-controller
-      operationId: logout
-      responses:
-        "200":
-          description: OK
-  /v1/api/auth/login:
-    post:
-      tags:
-        - auth-controller
-      operationId: authenticateUser
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/LoginRequest"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            "*/*":
-              schema:
-                type: object
-  /v1/api/auth/login/generate-magic-link:
-    post:
-      tags:
-        - auth-controller
-      operationId: generateMagicLink
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/MagicLoginRequest"
-        required: true
-      responses:
-        "200":
-          description: OK
-  /v1/api/auth/forgot-password:
-    post:
-      tags:
-        - auth-controller
-      operationId: forgotPassword
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ForgotPasswordRequest"
-        required: true
-      responses:
-        "200":
-          description: OK
-  /v1/admin/whitelist/{id}/approve:
-    post:
-      tags:
-        - admin-controller
-      operationId: approveWhitelist
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        "200":
-          description: OK
-  /v1/admin/whitelist/invite:
-    post:
-      tags:
-        - admin-controller
-      operationId: inviteEmail
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/InviteRequest"
-        required: true
-      responses:
-        "200":
-          description: OK
-  /v1/admin/users/{userId}/reset-mfa:
-    post:
-      tags:
-        - admin-controller
-      operationId: resetUserMfa
-      parameters:
-        - name: userId
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        "200":
-          description: OK
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
   /v1/files/upload/{fileId}/register-uploaded:
     patch:
-      tags:
-        - file-controller
+      tags: [file-controller]
+      summary: Marcar arquivo como enviado após upload direto ao storage
       operationId: setFileUploaded
+      security:
+        - bearerAuth: []
       parameters:
         - name: fileId
           in: path
@@ -303,36 +79,19 @@ paths:
             format: int64
       responses:
         "200":
-          description: OK
-  /v1/share-url/{shortUrl}:
-    get:
-      tags:
-        - short-link-controller
-      operationId: redirect
-      parameters:
-        - name: shortUrl
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: jsonResponse
-          in: query
-          required: false
-          schema:
-            type: boolean
-            default: false
-      responses:
-        "200":
-          description: OK
-          content:
-            "*/*":
-              schema:
-                type: object
+          description: Arquivo marcado como enviado
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
   /v1/files/{fileId}:
     get:
-      tags:
-        - file-controller
+      tags: [file-controller]
+      summary: Obter URL assinada para download
       operationId: requestSignedUrlToGetFile
+      security:
+        - bearerAuth: []
       parameters:
         - name: fileId
           in: path
@@ -342,15 +101,21 @@ paths:
             format: int64
       responses:
         "200":
-          description: OK
+          description: URL assinada para download
           content:
-            "*/*":
+            application/json:
               schema:
                 $ref: "#/components/schemas/SignedUrlDTO"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
     delete:
-      tags:
-        - file-controller
+      tags: [file-controller]
+      summary: Deletar arquivo
       operationId: deleteFile
+      security:
+        - bearerAuth: []
       parameters:
         - name: fileId
           in: path
@@ -360,16 +125,23 @@ paths:
             format: int64
       responses:
         "200":
-          description: OK
+          description: Arquivo deletado
           content:
-            "*/*":
+            application/json:
               schema:
                 $ref: "#/components/schemas/SignedUrlDTO"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
   /v1/files/me:
     get:
-      tags:
-        - file-controller
+      tags: [file-controller]
+      summary: Listar arquivos do usuário autenticado
       operationId: listFiles
+      security:
+        - bearerAuth: []
       parameters:
         - name: params
           in: query
@@ -378,28 +150,91 @@ paths:
             $ref: "#/components/schemas/ListFilesRequestParams"
       responses:
         "200":
-          description: OK
+          description: Lista paginada de arquivos
           content:
-            "*/*":
+            application/json:
               schema:
                 $ref: "#/components/schemas/PageFileDTO"
-  /v1/api/auth/me:
-    get:
-      tags:
-        - auth-controller
-      operationId: me
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/api/auth/login:
+    post:
+      tags: [auth-controller]
+      summary: Login com email e senha
+      operationId: authenticateUser
+      security: []
+      parameters:
+        - name: X-Http-Only
+          in: header
+          required: false
+          description: |
+            Controla como os tokens são retornados.
+            - `true` (padrão): tokens injetados como cookies HttpOnly, resposta `204`
+            - `false`: tokens retornados no body JSON, resposta `200`
+          schema:
+            type: string
+            enum: ["true", "false"]
+            default: "true"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
       responses:
         "200":
-          description: OK
+          description: |
+            Login bem-sucedido com tokens no body (quando `X-Http-Only: false`).
+            Retorna `TokenResponse` se MFA não estiver habilitado,
+            ou `MfaJwtResponse` se MFA for necessário.
           content:
-            "*/*":
+            application/json:
               schema:
-                $ref: "#/components/schemas/UserInfoDTO"
+                oneOf:
+                  - $ref: "#/components/schemas/TokenResponse"
+                  - $ref: "#/components/schemas/MfaJwtResponse"
+          headers:
+            X-Client-Action:
+              schema:
+                type: string
+                example: refresh-user
+        "204":
+          description: Login bem-sucedido com tokens injetados como cookies HttpOnly (padrão).
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: "access_token=eyJ...; HttpOnly; Secure; Path=/"
+            X-Client-Action:
+              schema:
+                type: string
+                example: refresh-user
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/api/auth/login/generate-magic-link:
+    post:
+      tags: [auth-controller]
+      summary: Solicitar magic link por email
+      operationId: generateMagicLink
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MagicLoginRequest"
+      responses:
+        "200":
+          description: Magic link enviado para o email (se o email existir)
+
   /v1/api/auth/login/magic-link:
     get:
-      tags:
-        - auth-controller
+      tags: [auth-controller]
+      summary: Autenticar via magic link
       operationId: authenticateUserWithMagicLink
+      security: []
       parameters:
         - name: token
           in: query
@@ -408,34 +243,49 @@ paths:
             type: string
       responses:
         "200":
-          description: OK
+          description: Autenticação bem-sucedida
           content:
-            "*/*":
+            application/json:
               schema:
                 $ref: "#/components/schemas/TokenResponse"
-  /v1/api/auth/invite-info:
-    get:
-      tags:
-        - auth-controller
-      operationId: getInviteInfo
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/api/auth/register:
+    post:
+      tags: [auth-controller]
+      summary: Registrar novo usuário
+      operationId: registerUser
+      security: []
       parameters:
         - name: invite
           in: query
-          required: true
+          required: false
+          description: Token de convite (obrigatório se whitelist estiver ativa)
           schema:
             type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignupRequest"
       responses:
         "200":
-          description: OK
+          description: Usuário registrado com sucesso
           content:
-            "*/*":
+            application/json:
               schema:
-                $ref: "#/components/schemas/WhitelistEntryDTO"
+                $ref: "#/components/schemas/MessageResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
   /v1/api/auth/confirm/{token}:
     get:
-      tags:
-        - auth-controller
+      tags: [auth-controller]
+      summary: Confirmar email via token
       operationId: confirmEmail
+      security: []
       parameters:
         - name: token
           in: path
@@ -444,16 +294,347 @@ paths:
             type: string
       responses:
         "200":
-          description: OK
+          description: Email confirmado
           content:
-            "*/*":
+            application/json:
               schema:
                 $ref: "#/components/schemas/MessageResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /v1/api/auth/invite-info:
+    get:
+      tags: [auth-controller]
+      summary: Obter informações de um convite
+      operationId: getInviteInfo
+      security: []
+      parameters:
+        - name: invite
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Dados do convite
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WhitelistEntryDTO"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /v1/api/auth/forgot-password:
+    post:
+      tags: [auth-controller]
+      summary: Solicitar redefinição de senha
+      operationId: forgotPassword
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ForgotPasswordRequest"
+      responses:
+        "200":
+          description: Email de redefinição enviado (se o email existir)
+
+  /v1/api/auth/reset-password:
+    post:
+      tags: [auth-controller]
+      summary: Redefinir senha com token
+      operationId: resetPassword
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResetPasswordRequest"
+      responses:
+        "200":
+          description: Senha redefinida com sucesso
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /v1/api/auth/refresh:
+    post:
+      tags: [auth-controller]
+      summary: Renovar access token
+      description: |
+        Renova o access token usando o refresh token.
+
+        O refresh token pode ser enviado de duas formas:
+        - Cookie HttpOnly `refresh_token` (padrão)
+        - Header `X-Refresh-Token: <token>` (para clientes sem suporte a cookies)
+
+        A resposta varia conforme o header `X-Http-Only`:
+        - `true` (padrão): retorna `204` e injeta os tokens como cookies HttpOnly
+        - `false`: retorna `200` com os tokens no body JSON
+      operationId: refresh
+      security: []
+      parameters:
+        - name: X-Refresh-Token
+          in: header
+          required: false
+          description: Refresh token (alternativa ao cookie `refresh_token`)
+          schema:
+            type: string
+        - name: X-Http-Only
+          in: header
+          required: false
+          description: Controla se os tokens são retornados no body (`false`) ou via cookie HttpOnly (padrão)
+          schema:
+            type: string
+            enum: ["true", "false"]
+            default: "true"
+      responses:
+        "200":
+          description: "Tokens retornados no body (quando `X-Http-Only: false`)"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+          headers:
+            X-Client-Action:
+              schema:
+                type: string
+                example: refresh-user
+        "204":
+          description: Tokens injetados como cookies HttpOnly (comportamento padrão)
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: "access_token=eyJ...; HttpOnly; Secure; Path=/"
+            X-Client-Action:
+              schema:
+                type: string
+                example: refresh-user
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/api/auth/logout:
+    post:
+      tags: [auth-controller]
+      summary: Encerrar sessão
+      description: Invalida o refresh token e limpa os cookies de sessão.
+      operationId: logout
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Logout realizado com sucesso
+
+  /v1/api/auth/me:
+    get:
+      tags: [auth-controller]
+      summary: Obter dados do usuário autenticado
+      operationId: me
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Dados do usuário
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserInfoDTO"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/api/auth/account:
+    delete:
+      tags: [auth-controller]
+      summary: Deletar conta do usuário autenticado
+      operationId: deleteAccount
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Conta deletada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/api/auth/mfa/setup/initiate:
+    post:
+      tags: [auth-controller]
+      summary: Iniciar configuração de MFA
+      description: |
+        Requer autenticação normal (bearerAuth).
+        Retorna um token temporário de MFA (`mfaAuth`) para uso nos próximos passos.
+      operationId: startSetupMfa
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Token temporário MFA gerado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MfaJwtResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/api/auth/mfa/setup:
+    post:
+      tags: [auth-controller]
+      summary: Obter QR Code para configuração de MFA
+      description: |
+        Requer o token temporário MFA obtido em `/v1/api/auth/mfa/setup/initiate`
+        no header `Authorization: Bearer <mfa-token>`.
+      operationId: setupMfa
+      security:
+        - mfaAuth: []
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: "Token temporário MFA: `Bearer <mfa-token>`"
+          schema:
+            type: string
+            example: "Bearer eyJhbGci..."
+      responses:
+        "200":
+          description: QR Code SVG para configuração no autenticador
+          content:
+            image/svg+xml:
+              schema:
+                type: string
+                format: byte
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/api/auth/mfa/confirm:
+    post:
+      tags: [auth-controller]
+      summary: Confirmar configuração de MFA com código TOTP
+      description: |
+        Requer o token temporário MFA obtido em `/v1/api/auth/mfa/setup/initiate`
+        no header `Authorization: Bearer <mfa-token>`.
+      operationId: confirmMfaSetup
+      security:
+        - mfaAuth: []
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: "Token temporário MFA: `Bearer <mfa-token>`"
+          schema:
+            type: string
+            example: "Bearer eyJhbGci..."
+        - name: code
+          in: query
+          required: true
+          description: Código TOTP de 6 dígitos do autenticador
+          schema:
+            type: integer
+            format: int32
+      responses:
+        "200":
+          description: MFA configurado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/api/auth/mfa/verify:
+    post:
+      tags: [auth-controller]
+      summary: Verificar código MFA durante login
+      description: |
+        Usado após login quando MFA está habilitado.
+        Requer o token temporário MFA retornado no login
+        no header `Authorization: Bearer <mfa-token>`.
+      operationId: verifyMfa
+      security:
+        - mfaAuth: []
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: "Token temporário MFA retornado no login: `Bearer <mfa-token>`"
+          schema:
+            type: string
+            example: "Bearer eyJhbGci..."
+        - name: code
+          in: query
+          required: true
+          description: Código TOTP de 6 dígitos do autenticador
+          schema:
+            type: integer
+            format: int32
+      responses:
+        "200":
+          description: MFA verificado, tokens de sessão retornados
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/api/auth/session-transfer:
+    post:
+      tags: [session-transfer-controller]
+      summary: Gerar token de transferência de sessão
+      description: Permite transferir a sessão autenticada para outra plataforma (WEB ou MOBILE).
+      operationId: generateSessionTransferToken
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SessionTransferRequest"
+      responses:
+        "200":
+          description: Token de transferência gerado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionTransferResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/api/auth/session-exchange:
+    post:
+      tags: [session-transfer-controller]
+      summary: Trocar token de transferência por sessão ativa
+      description: Troca o token de transferência por tokens de sessão válidos na plataforma destino.
+      operationId: exchangeSession
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SessionExchangeRequest"
+      responses:
+        "200":
+          description: Sessão estabelecida com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
   /v1/admin/whitelist/pending:
     get:
-      tags:
-        - admin-controller
+      tags: [admin-controller]
+      summary: Listar solicitações de whitelist pendentes
       operationId: listPendingWhitelist
+      security:
+        - bearerAuth: []
       parameters:
         - name: page
           in: query
@@ -471,16 +652,70 @@ paths:
             default: 20
       responses:
         "200":
-          description: OK
+          description: Lista paginada de solicitações pendentes
           content:
-            "*/*":
+            application/json:
               schema:
                 $ref: "#/components/schemas/PageWhitelistEntryDTO"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /v1/admin/whitelist/{id}/approve:
+    post:
+      tags: [admin-controller]
+      summary: Aprovar solicitação de whitelist
+      operationId: approveWhitelist
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Solicitação aprovada
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /v1/admin/whitelist/invite:
+    post:
+      tags: [admin-controller]
+      summary: Convidar email para a plataforma
+      operationId: inviteEmail
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InviteRequest"
+      responses:
+        "200":
+          description: Convite enviado
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  # TODO: Ajustar endpoint que tenham queryParams definido como um objeto para a declaração correta dos queryParams
+  # Ex: /v1/admin/users, /v1/admin/users, /v1/admin/users
   /v1/admin/users:
     get:
-      tags:
-        - admin-controller
+      tags: [admin-controller]
+      summary: Listar usuários
       operationId: listUsers
+      security:
+        - bearerAuth: []
       parameters:
         - name: params
           in: query
@@ -489,16 +724,47 @@ paths:
             $ref: "#/components/schemas/ListUsersRequestParams"
       responses:
         "200":
-          description: OK
+          description: Lista paginada de usuários
           content:
-            "*/*":
+            application/json:
               schema:
                 $ref: "#/components/schemas/PageCompleteUserDTO"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /v1/admin/users/{userId}/reset-mfa:
+    post:
+      tags: [admin-controller]
+      summary: Resetar MFA de um usuário
+      operationId: resetUserMfa
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: MFA resetado com sucesso
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
   /v1/admin/files:
     get:
-      tags:
-        - admin-controller
+      tags: [admin-controller]
+      summary: Listar todos os arquivos (admin)
       operationId: listFiles_1
+      security:
+        - bearerAuth: []
       parameters:
         - name: params
           in: query
@@ -507,16 +773,23 @@ paths:
             $ref: "#/components/schemas/ListFilesRequestParams"
       responses:
         "200":
-          description: OK
+          description: Lista paginada de arquivos
           content:
-            "*/*":
+            application/json:
               schema:
                 $ref: "#/components/schemas/PageFileDTO"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
   /v1/admin/files/{fileId}:
     get:
-      tags:
-        - admin-controller
+      tags: [admin-controller]
+      summary: Obter arquivo com URL assinada (admin)
       operationId: getFile
+      security:
+        - bearerAuth: []
       parameters:
         - name: fileId
           in: path
@@ -526,15 +799,23 @@ paths:
             format: int64
       responses:
         "200":
-          description: OK
+          description: Dados do arquivo com URL assinada
           content:
-            "*/*":
+            application/json:
               schema:
                 $ref: "#/components/schemas/AdminFileSignedUrl"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
     delete:
-      tags:
-        - admin-controller
+      tags: [admin-controller]
+      summary: Deletar arquivo (admin)
       operationId: deleteFile_1
+      security:
+        - bearerAuth: []
       parameters:
         - name: fileId
           in: path
@@ -544,35 +825,106 @@ paths:
             format: int64
       responses:
         "200":
-          description: OK
+          description: Arquivo deletado
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
   /health:
     get:
-      tags:
-        - health-check-controller
+      tags: [health-check-controller]
+      summary: Verificar saúde da aplicação
       operationId: health
+      security: []
       responses:
         "200":
-          description: OK
+          description: Aplicação saudável
           content:
-            "*/*":
+            application/json:
               schema:
                 type: object
-  /v1/api/auth/account:
-    delete:
-      tags:
-        - auth-controller
-      operationId: deleteAccount
+
+  /v1/share-url/{shortUrl}:
+    get:
+      tags: [short-link-controller]
+      summary: Redirecionar link curto de compartilhamento
+      operationId: redirect
+      security: []
+      parameters:
+        - name: shortUrl
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: jsonResponse
+          in: query
+          required: false
+          description: Se `true`, retorna os dados em JSON em vez de redirecionar
+          schema:
+            type: boolean
+            default: false
       responses:
         "200":
-          description: OK
+          description: |
+            Dados do arquivo (quando `jsonResponse=true`).
+            Retorna JSON se ?jsonResponse=true, caso contrário redireciona (302).
           content:
-            "*/*":
+            application/json:
               schema:
-                $ref: "#/components/schemas/MessageResponse"
+                $ref: "#/components/schemas/ShortLinkUrlResponse"
+              examples:
+                exemplo:
+                  summary: Exemplo de resposta JSON
+                  value:
+                    url: "https://files.example.com/file/abc123"
+        "302":
+          description: Redirecionamento para URL do arquivo (quando `jsonResponse` não está presente ou é `false`)
+        "404":
+          $ref: "#/components/responses/NotFound"
+
 components:
+  responses:
+    Unauthorized:
+      description: Não autenticado. Token ausente, inválido ou expirado.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Forbidden:
+      description: Sem permissão para acessar este recurso.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFound:
+      description: Recurso não encontrado.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    BadRequest:
+      description: Dados inválidos na requisição.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
   schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        status:
+          type: integer
+          format: int32
+
     RequestPostFileDTO:
       type: object
+      required: [fileSize]
       properties:
         fileName:
           type: string
@@ -584,8 +936,7 @@ components:
         fileSize:
           type: integer
           format: int64
-      required:
-        - fileSize
+
     SignedUrlDTO:
       type: object
       properties:
@@ -601,53 +952,60 @@ components:
         expirationDate:
           type: string
           format: date-time
+
     SessionTransferRequest:
       type: object
       properties:
         target:
           type: string
-          minLength: 1
-          pattern: WEB|MOBILE
+          enum: [WEB, MOBILE]
+
     SessionTransferResponse:
       type: object
       properties:
         transferToken:
           type: string
+
     SessionExchangeRequest:
       type: object
       properties:
         token:
           type: string
+
     ResetPasswordRequest:
       type: object
+      required: [token, newPassword]
       properties:
         token:
           type: string
           minLength: 1
         newPassword:
           type: string
-          maxLength: 40
           minLength: 6
+          maxLength: 40
+
     SignupRequest:
       type: object
       properties:
         name:
           type: string
-          maxLength: 100
           minLength: 0
+          maxLength: 100
         email:
           type: string
-          maxLength: 100
           minLength: 0
+          maxLength: 100
         password:
           type: string
-          maxLength: 40
           minLength: 6
+          maxLength: 40
+
     MessageResponse:
       type: object
       properties:
         message:
           type: string
+
     TokenResponse:
       type: object
       properties:
@@ -655,46 +1013,58 @@ components:
           type: string
         accessToken:
           type: string
+
     MfaJwtResponse:
       type: object
+      description: Token temporário para fluxo de MFA
       properties:
         token:
           type: string
         type:
           type: string
+          example: MFA
+
     LoginRequest:
       type: object
+      required: [email, password]
       properties:
         email:
           type: string
-          maxLength: 100
           minLength: 0
+          maxLength: 100
         password:
           type: string
-          maxLength: 40
           minLength: 6
+          maxLength: 40
+
     MagicLoginRequest:
       type: object
+      required: [email]
       properties:
         email:
           type: string
-          maxLength: 100
           minLength: 0
+          maxLength: 100
+
     ForgotPasswordRequest:
       type: object
+      required: [email]
       properties:
         email:
           type: string
-          maxLength: 100
           minLength: 0
+          maxLength: 100
+
     InviteRequest:
       type: object
+      required: [email]
       properties:
         email:
           type: string
           minLength: 1
         name:
           type: string
+
     ListFilesRequestParams:
       type: object
       properties:
@@ -704,13 +1074,14 @@ components:
         rows:
           type: integer
           format: int32
-          maximum: 100
           minimum: 1
+          maximum: 100
         sort:
           type: string
-          pattern: asc|desc|ASC|DESC
+          enum: [asc, desc, ASC, DESC]
         uploaded:
           type: boolean
+
     FileDTO:
       type: object
       properties:
@@ -734,6 +1105,7 @@ components:
           format: date-time
         contentType:
           type: string
+
     PageFileDTO:
       type: object
       properties:
@@ -766,6 +1138,7 @@ components:
           $ref: "#/components/schemas/PageableObject"
         empty:
           type: boolean
+
     PageableObject:
       type: object
       properties:
@@ -784,6 +1157,7 @@ components:
           format: int32
         unpaged:
           type: boolean
+
     SortObject:
       type: object
       properties:
@@ -793,6 +1167,7 @@ components:
           type: boolean
         sorted:
           type: boolean
+
     StorageDetails:
       type: object
       properties:
@@ -802,6 +1177,7 @@ components:
         usedQuota:
           type: integer
           format: int64
+
     UserInfoDTO:
       type: object
       properties:
@@ -815,6 +1191,7 @@ components:
           type: boolean
         storage:
           $ref: "#/components/schemas/StorageDetails"
+
     WhitelistEntryDTO:
       type: object
       properties:
@@ -827,12 +1204,11 @@ components:
           type: string
         status:
           type: string
-          enum:
-            - ALLOWED
-            - PENDING
+          enum: [ALLOWED, PENDING]
         createdAt:
           type: string
           format: date-time
+
     PageWhitelistEntryDTO:
       type: object
       properties:
@@ -865,6 +1241,7 @@ components:
           $ref: "#/components/schemas/PageableObject"
         empty:
           type: boolean
+
     ListUsersRequestParams:
       type: object
       properties:
@@ -874,11 +1251,12 @@ components:
         rows:
           type: integer
           format: int32
-          maximum: 100
           minimum: 1
+          maximum: 100
         sort:
           type: string
-          pattern: asc|desc|ASC|DESC
+          enum: [asc, desc, ASC, DESC]
+
     CompleteUserDTO:
       type: object
       properties:
@@ -903,6 +1281,14 @@ components:
           format: date-time
         settings:
           $ref: "#/components/schemas/UserSettingsProjection"
+    ShortLinkUrlResponse:
+      type: object
+      description: Resposta JSON ao acessar o link curto com ?jsonResponse=true
+      properties:
+        url:
+          type: string
+          description: URL original do arquivo
+
     PageCompleteUserDTO:
       type: object
       properties:
@@ -935,6 +1321,7 @@ components:
           $ref: "#/components/schemas/PageableObject"
         empty:
           type: boolean
+
     UserSettingsProjection:
       type: object
       properties:
@@ -947,6 +1334,7 @@ components:
         modifiedAt:
           type: string
           format: date-time
+
     AdminFileSignedUrl:
       type: object
       properties:
@@ -954,6 +1342,7 @@ components:
           type: string
         timestamps:
           $ref: "#/components/schemas/UrlTimestamps"
+
     UrlTimestamps:
       type: object
       properties:
@@ -963,10 +1352,20 @@ components:
         expirationTime:
           type: string
           format: date-time
+
   securitySchemes:
     bearerAuth:
       type: http
-      description: JWT Authorization header usando Bearer token
-      in: header
+      description: |
+        JWT de acesso obtido via login.
+        Envie no header: `Authorization: Bearer <access-token>`
+      scheme: bearer
+      bearerFormat: JWT
+    mfaAuth:
+      type: http
+      description: |
+        Token temporário de MFA retornado em `/v1/api/auth/mfa/setup/initiate`
+        ou no login quando MFA está habilitado.
+        Envie no header: `Authorization: Bearer <mfa-token>`
       scheme: bearer
       bearerFormat: JWT

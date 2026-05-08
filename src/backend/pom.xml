@@ -128,6 +128,8 @@
 		  <artifactId>logstash-logback-encoder</artifactId>
 		  <version>7.4</version>
 		</dependency>
+		<!-- TODO: Considerar remover actuator, validar healthchecks dos docker composes caso remover -->
+		<!-- Caso decida manter, remover o controller customizado de health (e tbm validar os health checks) -->
 		<dependency>
 		  <groupId>org.springframework.boot</groupId>
 		  <artifactId>spring-boot-starter-actuator</artifactId>
