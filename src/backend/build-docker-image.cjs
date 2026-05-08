@@ -85,8 +85,6 @@ const version = getVersionFromPom("./pom.xml");
 
 console.log(`Versão detectada no pom.xml: ${version}`);
 
-// Apenas para pegar o arquivo de env correto, o build ainda sera otimizado para produção
-const MODE = "production";
 const REGISTRY = "localhost:5000";
 const IMAGE_NAME = `${REGISTRY}/file-share-backend`;
 const TAG = `${IMAGE_NAME}:${version}`;
@@ -99,11 +97,11 @@ if (process.argv.includes("--print-version")) {
   process.exit(0);
 }
 
-console.log(`📦 Buildando Docker image: ${TAG} com MODE=${MODE}...`);
+console.log(`📦 Buildando Docker image: ${TAG}...`);
 
 try {
   execSync(
-    `wsl docker build -f Dockerfile.native --build-arg MODE=${MODE} -t ${TAG} -t ${IMAGE_NAME}:latest .`,
+    `wsl docker build -f Dockerfile.native -t ${TAG} -t ${IMAGE_NAME}:latest .`,
     {
       stdio: "inherit",
     },

@@ -1,11 +1,9 @@
 version: '3'
 
 services:
-  mailpit:
+  mailpit-e2e:
     # https://mailpit.axllent.org/docs/install/docker/
     image: axllent/mailpit
-    container_name: mailpit
-    restart: unless-stopped
     volumes:
       - ./emaildata:/data
     ports:
@@ -80,7 +78,7 @@ services:
 
   fileshare-api:
     # Image id gerada localmente, ajuste conforme necessário
-    image: 2967a5d333f0
+    image: be4acd2f7ca3
     ports:
       - 8080:8080
     environment:
@@ -130,7 +128,7 @@ services:
         condition: service_completed_successfully
       garage_init:
         condition: service_completed_successfully
-      mailpit:
+      mailpit-e2e:
         condition: service_healthy
       garage:
         condition: service_healthy
@@ -139,7 +137,7 @@ services:
   # Adicionado aqui para ter o setup completo
   fileshare-ui:
     # Image id gerada localmente, ajuste conforme necessário
-    image: f5b495942bdb
+    image: 516006a4af61
     ports:
       - 5173:3000
     depends_on:

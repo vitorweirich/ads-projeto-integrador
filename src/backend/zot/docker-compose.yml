@@ -4,7 +4,6 @@ services:
   zot:
     image: ghcr.io/project-zot/zot:latest
     container_name: zot
-    restart: unless-stopped
     # User: vitor
     # Password: 123456
     ports:
