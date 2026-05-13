@@ -47,9 +47,9 @@ Pastas e arquivos principais:
   - `login.tsx` — Tela de Login
   - `cadastro.tsx` — Tela de Cadastro
   - `(tabs)/_layout.tsx` — Layout das abas
-  - `(tabs)/files/index.tsx` — Tela Meus Vídeos (listagem)
-  - `(tabs)/upload/index.tsx` — Tela de Envio de Vídeo
-  - `video/[id].tsx` — Tela de Visualização de Vídeo (detalhes/reprodução)
+  - `(tabs)/files/index.tsx` — Tela Meus Arquivos (listagem)
+  - `(tabs)/upload/index.tsx` — Tela de Envio de Arquivo
+  - `video/[id].tsx` — Tela de Visualização de Arquivo (detalhes/reprodução)
   - `_layout.tsx`, `+not-found.tsx` — Arquivos de layout e fallback
 - `components/` — Componentes reutilizáveis de UI
 - `contexts/AuthContext.tsx` — Contexto de autenticação
