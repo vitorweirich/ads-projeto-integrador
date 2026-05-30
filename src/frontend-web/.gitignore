@@ -29,6 +29,4 @@ coverage
 
 *.tsbuildinfo
 
-.env.development
-
 emaildata

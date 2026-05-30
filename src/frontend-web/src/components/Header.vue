@@ -5,6 +5,8 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import ThemeSelector from './ThemeSelector.vue'
 import StorageQuota from './StorageQuota.vue'
 
+const swaggerUrl = import.meta.env.VITE_API_BASE_URL + "/swagger/index.html"
+
 const auth = useAuthStore()
 const { isAuthenticated, isAdmin, user } = storeToRefs(auth)
 
@@ -87,6 +89,12 @@ const mobileLogout = () => {
               </li>
             </template>
             <template v-else>
+              <a
+                :href="swaggerUrl"
+                target="_blank"
+              >
+                Swagger API
+              </a>
               <li><router-link to="/login" data-cy="login-link">Entrar</router-link></li>
               <li><router-link to="/register" data-cy="register-link">Cadastrar</router-link></li>
             </template>
@@ -169,6 +177,12 @@ const mobileLogout = () => {
       <nav class="hidden xl:block">
         <ul class="flex items-center space-x-6">
           <li><ThemeSelector data-cy="theme-selector" /></li>
+          <a
+            :href="swaggerUrl"
+            target="_blank"
+          >
+            Swagger API
+          </a>
           <template v-if="isAdmin">
             <li>
               <router-link to="/admin/files" data-cy="admin-files-link"
@@ -249,6 +263,12 @@ const mobileLogout = () => {
     >
       <!-- Full menu for <lg -->
       <ul class="flex flex-col items-end gap-3 pt-3 md:hidden">
+        <a
+          :href="swaggerUrl"
+          target="_blank"
+        >
+          Swagger API
+        </a>
         <template v-if="isAdmin">
           <li>
             <router-link to="/admin/files" @click="mobileMenuOpen = false"
@@ -295,6 +315,12 @@ const mobileLogout = () => {
 
       <!-- Extras only for lg-xl (admin + storage) -->
       <ul class="hidden flex-col items-end gap-3 pt-3 md:flex xl:hidden">
+        <a
+          :href="swaggerUrl"
+          target="_blank"
+        >
+          Swagger API
+        </a>
         <template v-if="isAdmin">
           <li>
             <router-link to="/admin/files" @click="mobileMenuOpen = false"

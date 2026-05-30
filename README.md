@@ -18,6 +18,12 @@ Além do código-fonte, o repositório também inclui documentação do projeto 
 
 Projeto academico para planejar e construir uma plataforma de upload, listagem e compartilhamento de arquivos com acesso autenticado.
 
+## Desenvolvimento Local
+
+Para instruções detalhadas sobre configuração do ambiente, dependências, execução dos serviços e fluxo de desenvolvimento, consulte:
+
+- [Guia de Desenvolvimento](./DEVELOPMENT.md)
+
 ## Documentacao Organizada
 
 ### Requisitos e decisões de plataforma e tecnologias

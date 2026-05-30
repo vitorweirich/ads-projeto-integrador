@@ -236,6 +236,17 @@ paths:
       operationId: authenticateUserWithMagicLink
       security: []
       parameters:
+        - name: X-Http-Only
+          in: header
+          required: false
+          description: |
+            Controla como os tokens são retornados.
+            - `true` (padrão): tokens injetados como cookies HttpOnly, resposta `204`
+            - `false`: tokens retornados no body JSON, resposta `200`
+          schema:
+            type: string
+            enum: ["true", "false"]
+            default: "true"
         - name: token
           in: query
           required: true
@@ -367,10 +378,13 @@ paths:
 
         O refresh token pode ser enviado de duas formas:
         - Cookie HttpOnly `refresh_token` (padrão)
+
         - Header `X-Refresh-Token: <token>` (para clientes sem suporte a cookies)
+
 
         A resposta varia conforme o header `X-Http-Only`:
         - `true` (padrão): retorna `204` e injeta os tokens como cookies HttpOnly
+
         - `false`: retorna `200` com os tokens no body JSON
       operationId: refresh
       security: []
@@ -557,6 +571,17 @@ paths:
       security:
         - mfaAuth: []
       parameters:
+        - name: X-Http-Only
+          in: header
+          required: false
+          description: |
+            Controla como os tokens são retornados.
+            - `true` (padrão): tokens injetados como cookies HttpOnly, resposta `204`
+            - `false`: tokens retornados no body JSON, resposta `200`
+          schema:
+            type: string
+            enum: ["true", "false"]
+            default: "true"
         - name: Authorization
           in: header
           required: true
@@ -573,11 +598,27 @@ paths:
             format: int32
       responses:
         "200":
-          description: MFA verificado, tokens de sessão retornados
+          description: "MFA verificado, tokens retornados no body (quando `X-Http-Only: false`)"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/TokenResponse"
+          headers:
+            X-Client-Action:
+              schema:
+                type: string
+                example: refresh-user
+        "204":
+          description: MFA verificado, Tokens injetados como cookies HttpOnly (comportamento padrão)
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: "access_token=eyJ...; HttpOnly; Secure; Path=/"
+            X-Client-Action:
+              schema:
+                type: string
+                example: refresh-user
         "401":
           $ref: "#/components/responses/Unauthorized"
 
@@ -1366,6 +1407,7 @@ components:
       description: |
         Token temporário de MFA retornado em `/v1/api/auth/mfa/setup/initiate`
         ou no login quando MFA está habilitado.
+
         Envie no header: `Authorization: Bearer <mfa-token>`
       scheme: bearer
       bearerFormat: JWT

@@ -15,10 +15,10 @@ spring:
     properties:
       mail:
         smtp:
-          auth: ${EMAIL_SMTP_AUTH:true}
+          auth: ${EMAIL_SMTP_AUTH:false}
           starttls:
-            enable: ${EMAIL_SMTP_STARTTLS_ENABLE:true}
-            required: ${EMAIL_SMTP_STARTTLS_REQUIRED:true}
+            enable: ${EMAIL_SMTP_STARTTLS_ENABLE:false}
+            required: ${EMAIL_SMTP_STARTTLS_REQUIRED:false}
   datasource:
     driverClassName: org.postgresql.Driver
     url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/fileshare}
@@ -72,9 +72,9 @@ app:
   whitelist:
     enabled: ${WHITELIST_ENABLED:true}
   cookie:
-    secure: ${COOKIE_SECURE:true} # PRD deve ser: "true"
+    secure: ${COOKIE_SECURE:false} # PRD deve ser: "true"
     domain: ${COOKIE_DOMAIN:}
-    sameSite: ${COOKIE_SAMESITE:None} # PRD deve ser: "None"
+    sameSite: ${COOKIE_SAMESITE:Lax} # PRD deve ser: "None"
 
 management:
   server:
