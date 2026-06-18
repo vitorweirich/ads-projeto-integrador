@@ -20,6 +20,7 @@ const handleResetPassword = async () => {
   error.value = ''
   loading.value = true
   try {
+    // TODO: Adicionar mesma validação que esta presente no form de cadastro (/register)
     await api.post('/v1/api/auth/reset-password', {
       token: route.params.token,
       newPassword: password.value,

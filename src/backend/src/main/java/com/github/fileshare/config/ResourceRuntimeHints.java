@@ -20,11 +20,15 @@ public class ResourceRuntimeHints {
         	hints.reflection().registerType(java.util.UUID[].class);
         	
         	hints.reflection().registerType(UserWithStorageProjection.class, builder -> builder
-        	        .withMembers(MemberCategory.DECLARED_FIELDS, MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.INVOKE_DECLARED_METHODS));
+				.withMembers(MemberCategory.DECLARED_FIELDS, MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.INVOKE_DECLARED_METHODS));
 
-        	    hints.reflection().registerType(UserSettingsProjection.class, builder -> builder
-        	        .withMembers(MemberCategory.DECLARED_FIELDS, MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.INVOKE_DECLARED_METHODS));
+			hints.reflection().registerType(UserSettingsProjection.class, builder -> builder
+				.withMembers(MemberCategory.DECLARED_FIELDS, MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.INVOKE_DECLARED_METHODS));
         	
+			hints.reflection().registerType(
+    	    		com.github.fileshare.validation.ContentTypeAllowedValidator.class, builder -> builder
+	    		.withMembers(MemberCategory.DECLARED_FIELDS, MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.INVOKE_DECLARED_METHODS));
+
         	hints.resources()
             	.registerPattern("handlebars/*.html");
         	hints.resources()

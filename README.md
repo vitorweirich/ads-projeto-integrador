@@ -6,7 +6,20 @@
 - Professor(a): Alysson Borges
 - Disciplina: 30062 - PROJETO INTEGRADOR - EAD54-12
 
-Este repositório contém o desenvolvimento completo de uma **plataforma de compartilhamento temporário de arquivos**, criada como Projeto Integrador do curso de Análise e Desenvolvimento de Sistemas.
+Este repositório contém o desenvolvimento completo de uma [**plataforma de compartilhamento temporário de arquivos**](https://files.vitorweirich.com/), criada como Projeto Integrador do curso de Análise e Desenvolvimento de Sistemas.
+
+> Nessa versão inicial o sistema suporta os seguintes tipos de arquivo:
+> - "image/png"
+> - "image/jpeg"
+> - "video/mp4"
+> - "video/avi"
+> - "video/mkv"
+> - "video/x-matroska"
+> - "video/mov"
+> - "video/quicktime"
+> - "video/wmv"
+> - "video/ts"
+> - "application/pdf"
 
 O projeto abrange todas as etapas do desenvolvimento de um sistema, incluindo levantamento de requisitos, modelagem do negócio, documentação técnica e implementação da aplicação.
 
@@ -34,9 +47,9 @@ Documento com escopo funcional e não funcional do sistema, juntamente das plata
 
 ### API (Swagger)
 
-// TODO: Atualizar com o link swagger servideo pelo backend de PRD quando hospedado
+[API Docs (auto hospedado)](https://files-api.vitorweirich.com/swagger/index.html)
 
-[![API Docs](https://img.shields.io/badge/API-Swagger-green)](https://editor.swagger.io/?url=https://raw.githubusercontent.com/vitorweirich/ads-projeto-integrador/refs/heads/master/src/backend/src/main/resources/static/swagger/openapi.yaml)
+[API Docs (Swagger Editor)](https://editor.swagger.io/?url=https://raw.githubusercontent.com/vitorweirich/ads-projeto-integrador/refs/heads/master/src/backend/src/main/resources/static/swagger/openapi.yaml)
 
 ### Protótipo (APP Mobile)
 
@@ -73,3 +86,7 @@ TODO
 ### Backend
 
 TODO
+
+// TODO: Criar uma seção de 'Desafios' ou algo assim, documentando aprendizados.
+> Ex: Configurar timeouts no Traefik para o upload de arquivos grandes
+> Configurar garage como object storage (configurar cors e init, com alocação manual)

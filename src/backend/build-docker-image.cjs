@@ -85,7 +85,7 @@ const version = getVersionFromPom("./pom.xml");
 
 console.log(`Versão detectada no pom.xml: ${version}`);
 
-const REGISTRY = "localhost:5000";
+const REGISTRY = "registry.vitorweirich.com";
 const IMAGE_NAME = `${REGISTRY}/file-share-backend`;
 const TAG = `${IMAGE_NAME}:${version}`;
 
@@ -101,7 +101,7 @@ console.log(`📦 Buildando Docker image: ${TAG}...`);
 
 try {
   execSync(
-    `wsl docker build -f Dockerfile.native -t ${TAG} -t ${IMAGE_NAME}:latest .`,
+    `docker build -f Dockerfile.native -t ${TAG} -t ${IMAGE_NAME}:latest .`,
     {
       stdio: "inherit",
     },
@@ -111,8 +111,8 @@ try {
   if (PUSH) {
     try {
       console.log("⬆️  Pushando imagens para o registry...");
-      execSync(`wsl docker push ${TAG}`, { stdio: "inherit" });
-      execSync(`wsl docker push ${IMAGE_NAME}:latest`, { stdio: "inherit" });
+      execSync(`docker push ${TAG}`, { stdio: "inherit" });
+      execSync(`docker push ${IMAGE_NAME}:latest`, { stdio: "inherit" });
       console.log("✅ Imagens pushadas com sucesso.");
     } catch (errPush) {
       console.error("❌ Erro ao pushar as imagens:", errPush);

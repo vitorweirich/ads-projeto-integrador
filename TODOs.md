@@ -6,6 +6,8 @@
 
 - [ ] Rever todos os arquivos de config/envs (docker-compose, application.yml, .env, Dockerfile)
 - [ ] Considerar usar https://zotregistry.dev/v2.1.15/ como Docker Registry
+- [ ] Adicionar suporte a mais tipos de arquivos
+  > V2: Em uma evolução, criar algum mecanismo de segurança, pra validar os arquivos enviados
 
 ---
 
