@@ -39,6 +39,8 @@
 - [x] Corrigir TODOs comentados no codigo
   > OBS: Ainda existem TODOs, mas devem ficar para uma evolução futura
 - [] Melhorar estilização do menu humburguer (espaçamento a esquerda, botão sair) e possivelmente move os dados sobre uso de armazenamento para fora, talvez de uma forma mais resumida? ou priorizar sobre outro link/seletor de tema?
+- [ ] Adicionar 'outras maneiras de login' e colocar a opção de magic-link (por email)
+- [ ] Responsividade nas telas de listagem de arquivos e detalhe de arquivos
 
 ---
 

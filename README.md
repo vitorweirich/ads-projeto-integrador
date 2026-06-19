@@ -79,14 +79,6 @@ Link para apresentação do projeto no [YouTube](https://www.youtube.com/watch?v
 
 Link de apresentação dos testes automatizados com Cypress: https://www.youtube.com/watch?v=XLV8zDDAS74
 
-### Site
+### Site (Sistema no geral)
 
-TODO
-
-### Backend
-
-TODO
-
-// TODO: Criar uma seção de 'Desafios' ou algo assim, documentando aprendizados.
-> Ex: Configurar timeouts no Traefik para o upload de arquivos grandes
-> Configurar garage como object storage (configurar cors e init, com alocação manual)
+Link apresentação geral do projeto https://www.youtube.com/watch?v=-_H_0ihZt8I
