@@ -6,9 +6,12 @@
 - Professor(a): Alysson Borges
 - Disciplina: 30062 - PROJETO INTEGRADOR - EAD54-12
 
+**Durante o período de avaliação do projeto, ficara disponível uma [réplica das documentações .md desse repositório de forma agrupada.](https://wiki.vitorweirich.com/share/f9698ur6i5/p/projeto-integrador-UngfEM3xJ7)**
+
 Este repositório contém o desenvolvimento completo de uma [**plataforma de compartilhamento temporário de arquivos**](https://files.vitorweirich.com/), criada como Projeto Integrador do curso de Análise e Desenvolvimento de Sistemas.
 
 > Nessa versão inicial o sistema suporta os seguintes tipos de arquivo:
+>
 > - "image/png"
 > - "image/jpeg"
 > - "video/mp4"
